@@ -36,6 +36,10 @@
                     "Name": "InputLinearDepth",
                     "SlotType": "Input"
                 },
+                {
+                    "Name": "SceneColorInput",
+                    "SlotType": "Input"
+                },
                 // Input/Outputs...
                 {
                     "Name": "DepthStencil",
@@ -100,6 +104,13 @@
                             "AttachmentRef": {
                                 "Pass": "Parent",
                                 "Attachment": "InputLinearDepth"
+                            }
+                        },
+                        {
+                            "LocalSlot": "SceneColorInput",
+                            "AttachmentRef": {
+                                "Pass": "Parent",
+                                "Attachment": "SceneColorInput"
                             }
                         },
                         // Input/Outputs...
