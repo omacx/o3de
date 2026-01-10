@@ -16,6 +16,13 @@
                     "ScopeAttachmentStage":  "FragmentShader"
                 },
                 {
+                    "Name": "SceneColorInput",
+                    "ShaderInputName": "m_sceneColor",
+                    "SlotType": "Input",
+                    "ScopeAttachmentUsage": "Shader",
+                    "ScopeAttachmentStage":  "FragmentShader"
+                },
+                {
                     "Name": "InputOutput",
                     "SlotType": "InputOutput",
                     "ScopeAttachmentUsage": "RenderTarget"

@@ -214,6 +214,19 @@
                     ]
                 },
                 {
+                    "Name": "SceneColorCopy",
+                    "TemplateName": "SceneColorCopyTemplate",
+                    "Connections": [
+                        {
+                            "LocalSlot": "SceneColorInput",
+                            "AttachmentRef": {
+                                "Pass": "OpaquePass",
+                                "Attachment": "Output"
+                            }
+                        }
+                    ]
+                },
+                {
                     "Name": "TransparentPass",
                     "TemplateName": "TransparentParentTemplate",
                     "Connections": [
@@ -271,6 +284,13 @@
                             "AttachmentRef": {
                                 "Pass": "DepthPrePass",
                                 "Attachment": "Depth"
+                            }
+                        },
+                        {
+                            "LocalSlot": "SceneColorInput",
+                            "AttachmentRef": {
+                                "Pass": "SceneColorCopy",
+                                "Attachment": "Output"
                             }
                         },
                         {

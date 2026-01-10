@@ -241,6 +241,10 @@
                 "Path": "Passes/FullscreenShadow.pass"
             },
             {
+                "Name": "SceneColorCopyTemplate",
+                "Path": "Passes/SceneColorCopy.pass"
+            },
+            {
                 "Name": "LightCullingHeatmapTemplate",
                 "Path": "Passes/LightCullingHeatmap.pass"
             },

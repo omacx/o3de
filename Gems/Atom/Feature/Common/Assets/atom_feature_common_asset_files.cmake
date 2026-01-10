@@ -108,6 +108,7 @@ set(FILES
     Passes/DepthCheckerboard.pass
     Passes/DepthDownsample.pass
     Passes/DepthExponentiation.pass
+    Passes/SceneColorCopy.pass
     Passes/DepthMax.pass
     Passes/DepthMSAA.pass
     Passes/DepthOfField.pass
@@ -429,6 +430,8 @@ set(FILES
     Shaders/DiffuseGlobalIllumination/DiffuseGlobalFullscreen.shader
     Shaders/ForwardPassSrg.azsl
     Shaders/ForwardPassSrg.shader
+    Shaders/SceneColor/SceneColorCopy.azsl
+    Shaders/SceneColor/SceneColorCopy.shader
     Shaders/ImGui/ImGui.azsl
     Shaders/ImGui/ImGui.shader
     Shaders/LightCulling/LightCulling.azsl
