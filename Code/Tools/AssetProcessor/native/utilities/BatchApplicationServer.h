@@ -7,9 +7,7 @@
  */
 #pragma once
 
-#if !defined(Q_MOC_RUN)
 #include <native/utilities/ApplicationServer.h>
-#endif
 
 /** This Class is responsible for listening and getting new connections
  */
@@ -18,7 +16,7 @@ class BatchApplicationServer
 {
     Q_OBJECT
 public:
-    explicit BatchApplicationServer(QObject* parent = 0);
+    explicit BatchApplicationServer(QObject* parent = nullptr);
     ~BatchApplicationServer() override;
 
     bool startListening(unsigned short port = 0) override;

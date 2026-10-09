@@ -141,7 +141,8 @@ namespace AzToolsFramework
         m_completer->setCaseSensitivity(Qt::CaseInsensitive);
         m_completer->setFilterMode(Qt::MatchContains);
 
-        connect(m_completer->completionModel(), &QAbstractItemModel::modelReset, this, &PropertyAssetCtrl::OnCompletionModelReset);
+        m_completerResetConnection = connect(
+            m_completer->completionModel(), &QAbstractItemModel::modelReset, this, &PropertyAssetCtrl::OnCompletionModelReset);
         connect(m_completer, static_cast<void (QCompleter::*)(const QModelIndex& index)>(&QCompleter::activated), this, &PropertyAssetCtrl::OnAutocomplete);
 
         m_view = new AssetCompleterListView(this);
@@ -261,7 +262,7 @@ namespace AzToolsFramework
         }
 
         // 2a - Detect number of keys in lineEdit; if more than m_autocompleteAfterNumberOfChars, activate autocompleter
-        int chars = text.size();
+        int chars = static_cast<int>(text.size());
         if (chars >= s_autocompleteAfterNumberOfChars && !m_completerIsActive)
         {
             EnableAutocompleter();
@@ -349,8 +350,9 @@ namespace AzToolsFramework
     bool PropertyAssetCtrl::CanAcceptAsset(const AZ::Data::AssetId& assetId, const AZ::Data::AssetType& assetType) const
     {
         const auto selectableAssetTypes = GetSelectableAssetTypes();
-        const auto isSelectableAssetType =
-            AZStd::find(selectableAssetTypes.begin(), selectableAssetTypes.end(), assetType) != selectableAssetTypes.end();
+        // An empty list means no type filter is configured, matching the asset browser display filter behavior.
+        const auto isSelectableAssetType = selectableAssetTypes.empty()
+            || AZStd::find(selectableAssetTypes.begin(), selectableAssetTypes.end(), assetType) != selectableAssetTypes.end();
         return (assetId.IsValid() && !assetType.IsNull() && isSelectableAssetType);
     }
 
@@ -397,7 +399,7 @@ namespace AzToolsFramework
         {
             if (!m_optionalValidDragDropExtensions.isEmpty())
             {
-                const int dotIndex = path.lastIndexOf('.');
+                const int dotIndex = static_cast<int>(path.lastIndexOf('.'));
                 if (dotIndex >= 0)
                 {
                     const QString& extension = path.mid(dotIndex);
@@ -774,6 +776,10 @@ namespace AzToolsFramework
         AssetEditor::AssetEditorNotificationsBus::Handler::BusDisconnect();
         AzFramework::AssetCatalogEventBus::Handler::BusDisconnect();
         AssetSystemBus::Handler::BusDisconnect();
+        if (m_completerResetConnection)
+        {
+            QObject::disconnect(m_completerResetConnection);
+        }
     }
 
     void PropertyAssetCtrl::OnEditButtonClicked()
@@ -1667,14 +1673,19 @@ namespace AzToolsFramework
         (void)index;
         (void)node;
 
+        // Preserve the desired load behavior
+        AZ::Data::AssetLoadBehavior oldBehavior = instance.GetAutoLoadBehavior();
         if (!GUI->GetSelectedAssetID().IsValid())
         {
+            
             instance = property_t(AZ::Data::AssetId(), GUI->GetCurrentAssetType(), "");
         }
         else
         {
             instance = property_t(GUI->GetSelectedAssetID(), GUI->GetCurrentAssetType(), GUI->GetCurrentAssetHint());
         }
+        instance.SetAutoLoadBehavior(oldBehavior);
+
     }
 
     void AssetPropertyHandlerDefault::WriteGUIValuesIntoProperty(size_t index, PropertyAssetCtrl* GUI, property_t& instance, InstanceDataNode* node)
@@ -1832,4 +1843,3 @@ namespace AzToolsFramework
     }
 }
 
-#include "UI/PropertyEditor/moc_PropertyAssetCtrl.cpp"

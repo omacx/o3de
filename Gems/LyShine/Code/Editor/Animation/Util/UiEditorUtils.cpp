@@ -25,7 +25,7 @@ void HeapCheck::Check([[maybe_unused]] const char* file, [[maybe_unused]] int li
 #include <QCursor>
 #include <QPixmap>
 
-QCursor CMFCUtils::LoadCursor(UINT nIDResource, int hotX, int hotY)
+QCursor CMFCUtils::LoadCursor(unsigned int nIDResource, int hotX, int hotY)
 {
     QString path;
     switch (nIDResource)
@@ -60,7 +60,8 @@ QCursor CMFCUtils::LoadCursor(UINT nIDResource, int hotX, int hotY)
     if (!pm.isNull() && (hotX < 0 || hotX < 0))
     {
         QFile f(path);
-        f.open(QFile::ReadOnly);
+        [[maybe_unused]] const bool res = f.open(QFile::ReadOnly);
+        AZ_Assert(res, "Failed to open %s", qPrintable(path));
         QDataStream stream(&f);
         stream.setByteOrder(QDataStream::LittleEndian);
         f.read(10);
@@ -78,7 +79,7 @@ QString TrimTrailingZeros(QString str)
 {
     if (str.contains('.'))
     {
-        for (int p = str.size() - 1; p >= 0; --p)
+        for (int p = static_cast<int>(str.size()) - 1; p >= 0; --p)
         {
             if (str.at(p) == '.')
             {

@@ -59,6 +59,8 @@ set(FILES
     FocusMode/EditorFocusModeSelectionTests.cpp
     FocusMode/EditorFocusModeTests.cpp
     GenericComponentWrapperTest.cpp
+    GrowTextEditTests.cpp
+    LineEditRevertHandlerTests.cpp
     Input/QtEventToAzInputMapperTests.cpp
     InstanceDataHierarchy.cpp
     IntegerPrimtitiveTestConfig.h
@@ -184,6 +186,7 @@ set(FILES
     UI/EntityIdQLineEditTests.cpp
     UI/EntityOutlinerTests.cpp
     UI/EntityPropertyEditorTests.cpp
+    UI/PropertyAssetCtrlTests.cpp
     UI/AssetBrowserTests.cpp
     UndoStack.cpp
     Viewport/ClusterTests.cpp

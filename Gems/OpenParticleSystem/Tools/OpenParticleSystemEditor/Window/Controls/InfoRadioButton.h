@@ -12,9 +12,7 @@
 #include <QLabel>
 #include <QButtonGroup>
 
-#if !defined(Q_MOC_RUN)
 #include <AzCore/std/string/string.h>
-#endif
 
 namespace OpenParticleSystemEditor
 {
@@ -22,7 +20,7 @@ namespace OpenParticleSystemEditor
     {
         Q_OBJECT
     public:
-        InfoRadioButton(const QString& text, int count, QWidget* parent = 0);
+        InfoRadioButton(const QString& text, int count, QWidget* parent = nullptr);
         ~InfoRadioButton() override;
         void SetCurrentChecked(int index);
 

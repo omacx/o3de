@@ -44,7 +44,7 @@ bool AssetProcessorManager_Test::CheckJobKeyToJobRunKeyMap(AZStd::string jobKey)
 
 AssetProcessorManagerTest::AssetProcessorManagerTest()
     : m_argc(0)
-    , m_argv(0)
+    , m_argv(nullptr)
 {
 
     m_qApp.reset(new QCoreApplication(m_argc, m_argv));
@@ -5329,7 +5329,7 @@ TEST_F(AssetProcessorManagerTest, SourceFileProcessFailure_ClearsFingerprint)
         ASSERT_TRUE(writer.open(QFile::WriteOnly));
 
         QTextStream ts(&writer);
-        ts.setCodec("UTF-8");
+        ts.setEncoding(QStringConverter::Encoding::Utf8);
         ts << "Hello World";
     }
 

@@ -7,7 +7,6 @@
  */
 #pragma once
 
-#if !defined(Q_MOC_RUN)
 #include <AzQtComponents/AzQtComponentsAPI.h>
 
 #include <QWidget>
@@ -19,7 +18,6 @@ AZ_POP_DISABLE_WARNING
 #include <QList>
 #include <QStringList>
 #include <QColor>
-#endif
 
 class QPixmap;
 
@@ -70,7 +68,7 @@ namespace AzQtComponents
         Q_PROPERTY(AzQtComponents::VectorEditElement::Flavor flavor READ flavor WRITE setFlavor NOTIFY flavorChanged)
 
     public:
-        explicit VectorEdit(QWidget* parent = 0);
+        explicit VectorEdit(QWidget* parent = nullptr);
 
         QVector3D vector() const;
         float x() const;

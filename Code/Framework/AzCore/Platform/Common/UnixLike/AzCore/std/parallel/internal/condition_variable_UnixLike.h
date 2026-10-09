@@ -19,13 +19,13 @@ namespace AZStd
     // Condition variable
     inline condition_variable::condition_variable()
     {
-        pthread_cond_init (&m_cond_var, NULL);
+        pthread_cond_init (&m_cond_var, nullptr);
     }
 
     inline condition_variable::condition_variable(const char* name)
     {
         (void)name;
-        pthread_cond_init (&m_cond_var, NULL);
+        pthread_cond_init (&m_cond_var, nullptr);
     }
 
     inline condition_variable::~condition_variable()
@@ -97,7 +97,7 @@ namespace AZStd
     template <class Rep, class Period, class Predicate>
     AZ_FORCE_INLINE bool condition_variable::wait_for(unique_lock<mutex>& lock, const chrono::duration<Rep, Period>& rel_time, Predicate pred)
     {
-        return wait_until(lock, chrono::steady_clock::now() + rel_time, move(pred));
+        return wait_until(lock, chrono::steady_clock::now() + rel_time, AZStd::move(pred));
     }
     condition_variable::native_handle_type
     inline condition_variable::native_handle()
@@ -109,15 +109,15 @@ namespace AZStd
     // Condition variable any
     inline condition_variable_any::condition_variable_any()
     {
-        pthread_mutex_init(&m_mutex, NULL);
-        pthread_cond_init (&m_cond_var, NULL);
+        pthread_mutex_init(&m_mutex, nullptr);
+        pthread_cond_init (&m_cond_var, nullptr);
     }
 
     inline condition_variable_any::condition_variable_any(const char* name)
     {
-        pthread_mutex_init(&m_mutex, NULL);
+        pthread_mutex_init(&m_mutex, nullptr);
         (void)name;
-        pthread_cond_init (&m_cond_var, NULL);
+        pthread_cond_init (&m_cond_var, nullptr);
     }
 
     inline condition_variable_any::~condition_variable_any()
@@ -204,7 +204,7 @@ namespace AZStd
     template <class Lock, class Rep, class Period, class Predicate>
     AZ_FORCE_INLINE bool condition_variable_any::wait_for(Lock& lock, const chrono::duration<Rep, Period>& rel_time, Predicate pred)
     {
-        return wait_until(lock, chrono::steady_clock::now() + rel_time, move(pred));
+        return wait_until(lock, chrono::steady_clock::now() + rel_time, AZStd::move(pred));
     }
     condition_variable_any::native_handle_type
     inline condition_variable_any::native_handle()

@@ -19,6 +19,7 @@
 #include <QPainter>
 #include <QScopedValueRollback>
 #include <QTimer>
+#include <QWindow>
 
 // AzCore
 #include <AzCore/Component/EntityId.h>
@@ -84,8 +85,6 @@
 
 #include <AzCore/Console/IConsole.h>
 #include <AzCore/Math/MatrixUtils.h>
-
-#include <QtGui/private/qhighdpiscaling_p.h>
 
 AZ_CVAR(
     bool, ed_visibility_logTiming, false, nullptr, AZ::ConsoleFunctorFlags::Null, "Output the timing of the new IVisibilitySystem query");
@@ -157,11 +156,8 @@ static void MarkCameraEntityDirty(const AZ::EntityId entityId)
 
     using AzToolsFramework::ToolsApplicationRequests;
 
-    AzToolsFramework::UndoSystem::URSequencePoint* undoBatch = nullptr;
-    ToolsApplicationRequests::Bus::BroadcastResult(
-        undoBatch, &ToolsApplicationRequests::Bus::Events::BeginUndoBatch, "EditorCameraComponentEntityChange");
-    ToolsApplicationRequests::Bus::Broadcast(&ToolsApplicationRequests::Bus::Events::AddDirtyEntity, entityId);
-    ToolsApplicationRequests::Bus::Broadcast(&ToolsApplicationRequests::Bus::Events::EndUndoBatch);
+    AzToolsFramework::ScopedUndoBatch undoBatch("EditorCameraComponentEntityChange");
+    undoBatch.MarkEntityDirty(entityId);
 }
 
 static void PopViewGroupForDefaultContext()
@@ -1230,12 +1226,10 @@ Vec3 EditorViewportWidget::WorldToView3D(const Vec3& wp, [[maybe_unused]] int nF
     float x, y;
 
     ProjectToScreen(wp.x, wp.y, wp.z, &x, &y);
-    if (_finite(x) && _finite(y))
+    if (azisfinite(x) && azisfinite(y))
     {
         out.x = (x / 100) * m_rcClient.width();
         out.y = (y / 100) * m_rcClient.height();
-        out.x /= static_cast<float>(QHighDpiScaling::factor(windowHandle()->screen()));
-        out.y /= static_cast<float>(QHighDpiScaling::factor(windowHandle()->screen()));
     }
     return out;
 }
@@ -1265,7 +1259,7 @@ Vec3 EditorViewportWidget::ViewToWorld(
     const float maxDistance = 10000.f;
     Vec3 v = AZVec3ToLYVec3(ray.m_direction) * maxDistance;
 
-    if (!_finite(v.x) || !_finite(v.y) || !_finite(v.z))
+    if (!azisfinite(v.x) || !azisfinite(v.y) || !azisfinite(v.z))
     {
         return Vec3(0, 0, 0);
     }
@@ -1334,7 +1328,7 @@ void EditorViewportWidget::ViewToWorldRay(const QPoint& vp, Vec3& raySrc, Vec3& 
     float wx, wy, wz;
     UnProjectFromScreen(static_cast<float>(vp.x()), static_cast<float>(rc.bottom() - vp.y()), &wx, &wy, &wz);
 
-    if (!_finite(wx) || !_finite(wy) || !_finite(wz))
+    if (!azisfinite(wx) || !azisfinite(wy) || !azisfinite(wz))
     {
         return;
     }
@@ -2239,4 +2233,3 @@ AZStd::optional<AzFramework::ViewportBorderPadding> EditorViewportWidget::GetVie
     return AZStd::nullopt;
 }
 
-#include <moc_EditorViewportWidget.cpp>

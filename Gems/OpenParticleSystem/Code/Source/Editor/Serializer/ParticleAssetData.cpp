@@ -10,6 +10,9 @@
 #include <Atom/RPI.Reflect/Asset/AssetUtils.h>
 #include <AzCore/Serialization/Json/JsonSerialization.h>
 #include <AzCore/Serialization/Json/RegistrationContext.h>
+#include <AzCore/std/containers/unordered_set.h>
+#include <AzCore/std/parallel/lock.h>
+#include <AzCore/std/parallel/mutex.h>
 #include <Serializer/ParticleAssetData.h>
 
 namespace OpenParticle
@@ -56,6 +59,7 @@ namespace OpenParticle
             newEmitter->m_config = emitter->m_config;
             newEmitter->m_renderConfig = emitter->m_renderConfig;
             newEmitter->m_material = emitter->m_material;
+            newEmitter->m_materialOverrides = emitter->m_materialOverrides;
             newEmitter->m_model = emitter->m_model;
             newEmitter->m_skeletonModel = emitter->m_skeletonModel;
             newEmitter->m_meshSampleType = emitter->m_meshSampleType;
@@ -96,6 +100,7 @@ namespace OpenParticle
             newEmitter->m_config = emitter->m_config;
             newEmitter->m_renderConfig = emitter->m_renderConfig;
             newEmitter->m_material = emitter->m_material;
+            newEmitter->m_materialOverrides = emitter->m_materialOverrides;
             newEmitter->m_model = emitter->m_model;
             newEmitter->m_skeletonModel = emitter->m_skeletonModel;
             newEmitter->m_meshSampleType = emitter->m_meshSampleType;
@@ -166,6 +171,13 @@ namespace OpenParticle
                 return AZ::Failure(CreateParticleAssetFailure::RenderTypeMissing);
             }
 
+            // Track which emitter+material combinations we've already warned about
+            // to avoid spamming errors on every frame/render-tick, which can cause
+            // threading conflicts with editor EBus operations.
+            static AZStd::mutex s_warnedMutex;
+            static AZStd::unordered_set<AZStd::string> s_warnedMaterialTypeMismatches;
+            auto warnKey = AZStd::string::format("%s_%s", emitter->m_name.c_str(), materialAsset.GetHint().c_str());
+
             // we can only check this if the material is available.
             // Its possible the user got a new project, and has not yet compiled all materials.  in this case,
             // we cannot load the material in order to check it.  When this happens, we skip this check, because
@@ -177,36 +189,61 @@ namespace OpenParticle
                 if ((emitter->m_renderConfig.is<SimuCore::ParticleCore::SpriteConfig>()) &&
                     !((materialType.GetHint().ends_with("particlesprite.azmaterialtype"))))
                 {
-                    AZ_Error(
-                        "ParticleAssetData",
-                        false,
-                        "SpriteParticle needs material with ParticleSprite materialtype but is %s instead in emitter %s",
-                        materialType.ToString<AZStd::string>().c_str(),
-                        emitter->m_name.c_str());
+                    bool alreadyWarned = false;
+                    {
+                        AZStd::lock_guard<AZStd::mutex> lock(s_warnedMutex);
+                        alreadyWarned = !s_warnedMaterialTypeMismatches.insert(warnKey).second;
+                    }
+                    if (!alreadyWarned)
+                    {
+                        AZ_Error(
+                            "ParticleAssetData",
+                            false,
+                            "SpriteParticle needs material with ParticleSprite materialtype but is %s instead in emitter %s",
+                            materialType.ToString<AZStd::string>().c_str(),
+                            emitter->m_name.c_str());
+                    }
                     return AZ::Failure(CreateParticleAssetFailure::IncorrectMaterialType);
                 }
 
                 if ((emitter->m_renderConfig.is<SimuCore::ParticleCore::MeshConfig>()) &&
-                    !(materialType.GetHint().ends_with("particlemesh.azmaterialtype")))
+                    !(materialType.GetHint().ends_with("particlemesh.azmaterialtype") ||
+                      materialType.GetHint().ends_with("particlemesh_generated.azmaterialtype")))
                 {
-                    AZ_Error(
-                        "ParticleAssetData",
-                        false,
-                        "Mesh Particle needs material with ParticleMesh materialtype but is %s instead in emitter %s",
-                        materialType.ToString<AZStd::string>().c_str(),
-                        emitter->m_name.c_str());
+                    bool alreadyWarned = false;
+                    {
+                        AZStd::lock_guard<AZStd::mutex> lock(s_warnedMutex);
+                        alreadyWarned = !s_warnedMaterialTypeMismatches.insert(warnKey).second;
+                    }
+                    if (!alreadyWarned)
+                    {
+                        AZ_Error(
+                            "ParticleAssetData",
+                            false,
+                            "Mesh Particle needs material with ParticleMesh materialtype but is %s instead in emitter %s",
+                            materialType.ToString<AZStd::string>().c_str(),
+                            emitter->m_name.c_str());
+                    }
                     return AZ::Failure(CreateParticleAssetFailure::IncorrectMaterialType);
                 }
 
                 if ((emitter->m_renderConfig.is<SimuCore::ParticleCore::RibbonConfig>()) &&
                     !(materialType.GetHint().ends_with("particleribbon.azmaterialtype")))
                 {
-                    AZ_Error(
-                        "ParticleAssetData",
-                        false,
-                        "Ribbon Particle needs material with ParticleMesh materialtype but is %s instead in emitter %s",
-                        materialType.ToString<AZStd::string>().c_str(),
-                        emitter->m_name.c_str());
+                    bool alreadyWarned = false;
+                    {
+                        AZStd::lock_guard<AZStd::mutex> lock(s_warnedMutex);
+                        alreadyWarned = !s_warnedMaterialTypeMismatches.insert(warnKey).second;
+                    }
+                    if (!alreadyWarned)
+                    {
+                        AZ_Error(
+                            "ParticleAssetData",
+                            false,
+                            "Ribbon Particle needs material with ParticleMesh materialtype but is %s instead in emitter %s",
+                            materialType.ToString<AZStd::string>().c_str(),
+                            emitter->m_name.c_str());
+                    }
                     return AZ::Failure(CreateParticleAssetFailure::IncorrectMaterialType);
                 }
             }
@@ -247,6 +284,7 @@ namespace OpenParticle
             fn(emitter->m_updateModules);
             fn(emitter->m_eventModules);
             archive.Material(materialAsset);
+            archive.MaterialOverrides(emitter->m_materialOverrides);
             if (emitter->m_renderConfig.is<SimuCore::ParticleCore::MeshConfig>())
             {
                 archive.Model(modelAsset);

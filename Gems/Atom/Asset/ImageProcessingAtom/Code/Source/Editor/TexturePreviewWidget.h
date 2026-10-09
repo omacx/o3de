@@ -9,16 +9,15 @@
 #pragma once
 
 
-#if !defined(Q_MOC_RUN)
 #include <QWidget>
-#include <AzCore/Memory/SystemAllocator.h>
-#include <Editor/EditorCommon.h>
-#include <Editor/ImagePopup.h>
 #include <QEvent>
 #include <QTimer>
 
+#include <AzCore/Memory/SystemAllocator.h>
+#include <Editor/EditorCommon.h>
+#include <Editor/ImagePopup.h>
+
 #include <Processing/ImagePreview.h>
-#endif
 
 namespace Ui
 {
@@ -53,7 +52,7 @@ namespace ImageProcessingAtomEditor
         Q_OBJECT
     public:
         AZ_CLASS_ALLOCATOR(TexturePreviewWidget, AZ::SystemAllocator);
-        explicit TexturePreviewWidget(EditorTextureSetting& texureSetting, QWidget* parent = 0);
+        explicit TexturePreviewWidget(EditorTextureSetting& texureSetting, QWidget* parent = nullptr);
         ~TexturePreviewWidget();
         bool OnQtEvent(QEvent* event);
 

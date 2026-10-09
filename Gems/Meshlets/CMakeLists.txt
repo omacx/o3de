@@ -8,8 +8,4 @@
 
 o3de_gem_setup("Meshlets")
 
-get_property(atom_rpi_gem_root GLOBAL PROPERTY "@GEMROOT:Atom_RPI@")
-ly_add_external_target_path(${atom_rpi_gem_root}/3rdParty)
-
 add_subdirectory(Code)
-

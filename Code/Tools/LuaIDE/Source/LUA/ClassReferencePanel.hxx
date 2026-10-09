@@ -5,16 +5,13 @@
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
+#pragma once
 
-#if !defined(Q_MOC_RUN)
 #include <AzCore/base.h>
 
 #include <QObject>
 #include <QWidget>
 #include <QTreeView>
-#endif
-
-#pragma once
 
 namespace LUAEditor
 {
@@ -28,7 +25,7 @@ public:
     // class allocator inteintionally removed so that Qt gui designer can make us
     //AZ_CLASS_ALLOCATOR(DHClassReferenceWidget,AZ::SystemAllocator,0);
 
-    DHClassReferenceWidget( QWidget * parent = 0 );
+    DHClassReferenceWidget( QWidget * parent = nullptr );
     virtual ~DHClassReferenceWidget();
 
     public slots:

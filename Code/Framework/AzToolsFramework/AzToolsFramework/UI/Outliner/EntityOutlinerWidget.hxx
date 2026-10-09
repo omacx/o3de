@@ -10,7 +10,6 @@
 
 #include <AzToolsFramework/AzToolsFrameworkAPI.h>
 
-#if !defined(Q_MOC_RUN)
 #include <AzCore/Memory/SystemAllocator.h>
 #include <AzCore/base.h>
 
@@ -29,9 +28,6 @@
 
 #include <QIcon>
 #include <QWidget>
-#endif
-
-#pragma once
 
 class QAction;
 class QItemSelection;
@@ -75,7 +71,7 @@ namespace AzToolsFramework
     public:
         AZ_CLASS_ALLOCATOR(EntityOutlinerWidget, AZ::SystemAllocator)
 
-        explicit EntityOutlinerWidget(QWidget* pParent = NULL, Qt::WindowFlags flags = Qt::WindowFlags());
+        explicit EntityOutlinerWidget(QWidget* pParent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags());
         virtual ~EntityOutlinerWidget();
 
     private Q_SLOTS:

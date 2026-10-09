@@ -11,11 +11,9 @@
 #include <ProjectInfo.h>
 #include <ProjectManagerDefs.h>
 
-#if !defined(Q_MOC_RUN)
 #include <QWidget>
 #include <QMessageBox>
 #include <QProcessEnvironment>
-#endif
 
 #include <AzCore/Dependency/Dependency.h>
 #include <AzCore/IO/Path/Path_fwd.h>
@@ -28,6 +26,10 @@ namespace O3DE::ProjectManager
     {
         static constexpr AZStd::string_view EngineJsonFilename = "engine.json";
         static constexpr AZStd::string_view ProjectJsonFilename = "project.json";
+
+        // Without the file extension to be cross platform.
+        // %1 to be replaced with project name.
+        static constexpr AZStd::string_view EditorShortcutFilenameFormat = "%1 Editor";
 
         bool RegisterProject(const QString& path, QWidget* parent = nullptr);
         bool UnregisterProject(const QString& path, QWidget* parent = nullptr);
@@ -44,6 +46,16 @@ namespace O3DE::ProjectManager
         // If there are no notes, return an empty string on success.
         // Any notes returned will be showend as a message box or output log, regardless of success or failure.
         AZ::Outcome<QString, QString> FindSupportedCompilerForPlatform(const ProjectInfo& projectInfo);
+
+        //! Return the platform specific path separator for the PATH environment variable, e.g. ';' on windows and ':' on unix
+        QChar GetPlatformPathEnvSeparator();
+
+        //! Return the platform specific name of the PATH environment variable, e.g. 'Path' on windows and 'PATH' on unix
+        QString GetPlatformPathEnvVariableName();
+
+        //! modify the process environment to prepent the given path to the front of the system environment path
+        //! Prepend it, if prepend is true, otherwise append it.
+        bool AddPathToPathEnv(QString newPath, bool prepend = true);
 
         //! Detect if cmake is installed
         //! Does NOT detect if the version of cmake required to run O3DE
@@ -100,6 +112,13 @@ namespace O3DE::ProjectManager
          * @return AZ::Outcome with the command result on success
          */
         AZ::Outcome<QString, QString> CreateDesktopShortcut(const QString& filename, const QString& targetPath, const QStringList& arguments);
+
+        /*
+        * Delete a desktop shortcut previously created.
+        * @param filename the name of the desktop fortcut file
+        * @return bool true if deleted false otherwise
+        */
+        bool DeleteDesktopShortcut(const QString& filename);
 
         /**
          * Lookup the location of an Editor executable executable that can be used with the

@@ -7,15 +7,23 @@
 #
 
 o3de_gem_setup("PhysX5")
-get_property(v_hacd_gem_root GLOBAL PROPERTY "@GEMROOT:PhysXCommon@")
-list(APPEND CMAKE_MODULE_PATH ${v_hacd_gem_root}/3rdParty)
+set(legacy_gem_name_alias "PhysX")
 
 o3de_pal_dir(pal_source_dir ${CMAKE_CURRENT_LIST_DIR}/Source/Platform/${PAL_PLATFORM_NAME} "${gem_restricted_path}" "${gem_path}" "${gem_parent_relative_path}")
 
 include(${pal_source_dir}/PAL_${PAL_PLATFORM_NAME_LOWERCASE}.cmake) # for PAL_TRAIT_PHYSX_SUPPORTED
 
 if(PAL_TRAIT_PHYSX_SUPPORTED)
-    ly_add_target(NAME physx_5_dependency NAMESPACE Gem INTERFACE BUILD_DEPENDENCIES INTERFACE ciso646-include 3rdParty::PhysX5)
+    # The PhysX 5 SDK static libraries have circular dependencies on each other, FindPhysX5.cmake orders 
+    # them as a best-effort chain, but that isn't always sufficient for a single-pass GNU ld/lld link.
+    if(PAL_PLATFORM_NAME STREQUAL "Linux")
+        set(physx_5_link_group_start "-Wl,--start-group")
+        set(physx_5_link_group_end "-Wl,--end-group")
+    else()
+        set(physx_5_link_group_start)
+        set(physx_5_link_group_end)
+    endif()
+    ly_add_target(NAME physx_5_dependency NAMESPACE Gem INTERFACE BUILD_DEPENDENCIES INTERFACE ciso646-include ${physx_5_link_group_start} 3rdParty::PhysX5 ${physx_5_link_group_end})
     set(physx_dependency physx_5_dependency)
     set(physx_files ../Code/physx_files.cmake)
     set(physx_module_files physx_module_files.cmake)
@@ -53,6 +61,7 @@ ly_add_target(
         PRIVATE
             Gem::LmbrCentral.API
 )
+ly_create_alias(NAME ${legacy_gem_name_alias}.Static NAMESPACE Gem TARGETS Gem::${gem_name}.Static)
 
 ly_add_target(
     NAME ${gem_name} ${PAL_TRAIT_MONOLITHIC_DRIVEN_MODULE_TYPE}
@@ -76,6 +85,7 @@ ly_add_target(
     RUNTIME_DEPENDENCIES
         Gem::LmbrCentral
 )
+ly_create_alias(NAME ${legacy_gem_name_alias} NAMESPACE Gem TARGETS Gem::${gem_name})
 
 # Inject the gem name into the Module source file
 if(PAL_TRAIT_PHYSX_SUPPORTED)
@@ -100,6 +110,10 @@ endif()
 ly_create_alias(NAME ${gem_name}.Clients NAMESPACE Gem TARGETS Gem::${gem_name})
 ly_create_alias(NAME ${gem_name}.Servers NAMESPACE Gem TARGETS Gem::${gem_name})
 ly_create_alias(NAME ${gem_name}.Unified NAMESPACE Gem TARGETS Gem::${gem_name})
+
+ly_create_alias(NAME ${legacy_gem_name_alias}.Clients NAMESPACE Gem TARGETS Gem::${gem_name})
+ly_create_alias(NAME ${legacy_gem_name_alias}.Servers NAMESPACE Gem TARGETS Gem::${gem_name})
+ly_create_alias(NAME ${legacy_gem_name_alias}.Unified NAMESPACE Gem TARGETS Gem::${gem_name})
 
 if(PAL_TRAIT_BUILD_HOST_TOOLS)
 
@@ -143,12 +157,12 @@ if(PAL_TRAIT_BUILD_HOST_TOOLS)
         RUNTIME_DEPENDENCIES
             AZ::SceneCore
     )
+    ly_create_alias(NAME ${legacy_gem_name_alias}.Editor.Static NAMESPACE Gem TARGETS Gem::${gem_name}.Editor.Static)
 
     ly_add_target(
         NAME ${gem_name}.Editor GEM_MODULE
         NAMESPACE Gem
         OUTPUT_NAME ${gem_name}.Editor.Gem
-        AUTOMOC
         FILES_CMAKE
             ${physx_module_files}
         COMPILE_DEFINITIONS
@@ -165,10 +179,13 @@ if(PAL_TRAIT_BUILD_HOST_TOOLS)
             PRIVATE
                 Gem::${gem_name}.Editor.Static
     )
+    ly_create_alias(NAME ${legacy_gem_name_alias}.Editor NAMESPACE Gem TARGETS Gem::${gem_name}.Editor)
 
     # use the ${gem_name}.Editor module in dev tools:
     ly_create_alias(NAME ${gem_name}.Builders NAMESPACE Gem TARGETS Gem::${gem_name}.Editor)
     ly_create_alias(NAME ${gem_name}.Tools    NAMESPACE Gem TARGETS Gem::${gem_name}.Editor)
+    ly_create_alias(NAME ${legacy_gem_name_alias}.Builders NAMESPACE Gem TARGETS Gem::${gem_name}.Editor)
+    ly_create_alias(NAME ${legacy_gem_name_alias}.Tools NAMESPACE Gem TARGETS Gem::${gem_name}.Editor)
 
 endif()
 

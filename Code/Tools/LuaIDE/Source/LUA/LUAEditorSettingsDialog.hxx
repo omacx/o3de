@@ -5,18 +5,17 @@
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
+#pragma once
 
-#if !defined(Q_MOC_RUN)
 #include <AzCore/std/parallel/thread.h>
 #include <AzCore/std/parallel/semaphore.h>
 #include <AzCore/Component/Component.h>
+
 #include "LUAEditorView.hxx"
 #include "LUAEditorStyleMessages.h"
 
 #include <QDialog>
-#endif
 
-#pragma once
 
 namespace Ui
 {
@@ -31,7 +30,7 @@ namespace LUAEditor
         Q_OBJECT
     public:
         AZ_CLASS_ALLOCATOR(LUAEditorSettingsDialog, AZ::SystemAllocator);
-        LUAEditorSettingsDialog(QWidget *parent = 0);
+        LUAEditorSettingsDialog(QWidget *parent = nullptr);
         ~LUAEditorSettingsDialog() override;
         
     public Q_SLOTS:

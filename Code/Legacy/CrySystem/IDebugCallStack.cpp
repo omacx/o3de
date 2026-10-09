@@ -25,7 +25,7 @@ const char* const IDebugCallStack::s_szFatalErrorCode = "FATAL_ERROR";
 
 IDebugCallStack::IDebugCallStack()
     : m_bIsFatalError(false)
-    , m_postBackupProcess(0)
+    , m_postBackupProcess(nullptr)
     , m_memAllocFileHandle(AZ::IO::InvalidHandle)
 {
 }
@@ -53,7 +53,7 @@ void IDebugCallStack::LogCallstack()
     AZ::Debug::Trace::Instance().PrintCallstack("", 2);
 }
 
-const char* IDebugCallStack::TranslateExceptionCode(DWORD dwExcept)
+const char* IDebugCallStack::TranslateExceptionCode(AZ::u32 dwExcept)
 {
     switch (dwExcept)
     {
@@ -166,9 +166,9 @@ AZ_PUSH_DISABLE_WARNING(4996, "-Wunknown-warning-option")
     //! Use strftime to build a customized time string.
     strftime(s, 128, "Logged at %c\n", today);
     azstrcat(str, length, s);
-    sprintf_s(s, "FileVersion: %s\n", sFileVersion);
+    azsprintf(s, "FileVersion: %s\n", sFileVersion);
     azstrcat(str, length, s);
-    sprintf_s(s, "ProductVersion: %s\n", sProductVersion);
+    azsprintf(s, "ProductVersion: %s\n", sProductVersion);
     azstrcat(str, length, s);
 
     if (gEnv->pLog)
@@ -226,7 +226,7 @@ void IDebugCallStack::FatalError(const char* description)
 #endif
 
 #if defined(WIN32) || !defined(_RELEASE)
-    int* p = 0x0;
+    int* p = nullptr;
     *p = 1; // we're intentionally crashing here
 #endif
 }
@@ -236,7 +236,7 @@ void IDebugCallStack::WriteLineToLog(const char* format, ...)
     va_list ArgList;
     char        szBuffer[MAX_WARNING_LENGTH];
     va_start(ArgList, format);
-    vsnprintf_s(szBuffer, sizeof(szBuffer), sizeof(szBuffer) - 1, format, ArgList);
+    azvsnprintf(szBuffer, sizeof(szBuffer)-1, format, ArgList);
     azstrcat(szBuffer, MAX_WARNING_LENGTH, "\n");
     szBuffer[sizeof(szBuffer) - 1] = '\0';
     va_end(ArgList);

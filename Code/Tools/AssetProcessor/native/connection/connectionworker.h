@@ -7,14 +7,13 @@
  */
 #pragma once
 
-#if !defined(Q_MOC_RUN)
 #include <QTcpSocket>
 #include <QHostAddress>
+
 #include "native/connection/connectionMessages.h"
 
 #include <AzCore/Memory/Memory.h>
 #include <AzCore/Memory/SystemAllocator.h>
-#endif
 
 /** This Class is responsible for connecting to the client
  */
@@ -29,7 +28,7 @@ namespace AssetProcessor
         Q_OBJECT
 
     public:
-        explicit ConnectionWorker(qintptr socketDescriptor = -1, QObject* parent = 0);
+        explicit ConnectionWorker(qintptr socketDescriptor = -1, QObject* parent = nullptr);
         virtual ~ConnectionWorker();
         QTcpSocket& GetSocket();
         void Reset();

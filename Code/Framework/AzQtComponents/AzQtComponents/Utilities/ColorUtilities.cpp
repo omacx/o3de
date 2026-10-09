@@ -79,7 +79,7 @@ namespace AzQtComponents
         static const char Format = 'f';
         static const int Precision = 3;
 
-        qreal R, G, B, A;
+        float R, G, B, A;
         color.getRgbF(&R, &G, &B, &A);
         auto colorStr =
             includeAlphaChannel
@@ -87,6 +87,30 @@ namespace AzQtComponents
             : QStringLiteral("%1, %2, %3").arg(R, FieldWidth, Format, Precision).arg(G, FieldWidth, Format, Precision).arg(B, FieldWidth, Format, Precision)
             ;
         return colorStr;
+    }
+
+    AZ_QT_COMPONENTS_API QColor AzColorToQtColor(const AZ::Color& color)
+    {
+        return QColor::fromRgb(color.GetR8(), color.GetG8(), color.GetB8(), color.GetA8());
+    }
+
+    AZ_QT_COMPONENTS_API AZ::Color QtColorToAzColor(const QColor& color)
+    {
+        return AZ::Color::CreateFromRgba(color.red(), color.green(), color.blue(), color.alpha());
+    }
+
+    AZ_QT_COMPONENTS_API QColor ARGBToQColor(uint32_t argb)
+    {
+        // Convert ARGB (0x00bbggrr) to AZ::Color and then to QColor
+        AZ::Color azColor = AZ::Color::CreateFromU32(argb);
+        return AzColorToQtColor(azColor);
+    }
+
+    AZ_QT_COMPONENTS_API uint32_t QColorToARGB(const QColor& color)
+    {
+        // Convert QColor to AZ::Color and then to ARGB (0x00bbggrr)
+        AZ::Color azColor = QtColorToAzColor(color);
+        return azColor.ToU32();
     }
 
 } // namespace AzQtComponents

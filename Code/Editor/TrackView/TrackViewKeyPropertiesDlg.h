@@ -8,7 +8,6 @@
 
 #pragma once
 
-#if !defined(Q_MOC_RUN)
 #include "TrackViewDopeSheetBase.h"
 #include "TrackViewNode.h"
 #include "TrackViewSequence.h"
@@ -16,7 +15,6 @@
 #include <QDockWidget>
 #include <QScopedPointer>
 #include "Util/Variable.h"
-#endif
 
 #include <AzCore/std/containers/vector.h>
 
@@ -122,7 +120,7 @@ class CTrackViewTrackPropsDlg
 {
     Q_OBJECT
 public:
-    CTrackViewTrackPropsDlg(QWidget* parent = 0);
+    CTrackViewTrackPropsDlg(QWidget* parent = nullptr);
     ~CTrackViewTrackPropsDlg();
 
     void OnSequenceChanged();

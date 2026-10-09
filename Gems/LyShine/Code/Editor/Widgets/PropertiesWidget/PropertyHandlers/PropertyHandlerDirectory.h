@@ -7,15 +7,13 @@
  */
 #pragma once
 
-#if !defined(Q_MOC_RUN)
 #include <AzCore/Memory/SystemAllocator.h>
 #include <AzCore/base.h>
 #include <AzToolsFramework/UI/PropertyEditor/PropertyEditorAPI.h>
-#include <QWidget>
-
 #include <AzToolsFramework/AssetBrowser/AssetSelectionModel.h>
 #include <AzToolsFramework/UI/PropertyEditor/PropertyAssetCtrl.hxx>
-#endif
+
+#include <QWidget>
 
 class PropertyDirectoryCtrl : public QWidget
 {
@@ -42,7 +40,7 @@ class PropertyAssetDirectorySelectionCtrl : public AzToolsFramework::PropertyAss
 {
 public:
     AZ_CLASS_ALLOCATOR(PropertyAssetDirectorySelectionCtrl, AZ::SystemAllocator)
-    PropertyAssetDirectorySelectionCtrl(QWidget* pParent = NULL)
+    PropertyAssetDirectorySelectionCtrl(QWidget* pParent = nullptr)
         : PropertyAssetCtrl(pParent)
     {
     }

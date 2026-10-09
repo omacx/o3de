@@ -25,7 +25,8 @@ set(O3DE_COMPILE_OPTION_DISABLE_WARNINGS PRIVATE -w)
 
 # C++20 no longer allows to implicitly convert between enum values of different types or enum values and integral types.
 # This is problematic if 3rd-party libraries use such operations in header files.
-set(O3DE_COMPILE_OPTION_DISABLE_DEPRECATED_ENUM_ENUM_CONVERSION PRIVATE -Wno-deprecated-enum-enum-conversion)
+# C++26 (P2864) makes it a hard error under -Wenum-enum-conversion, so silence both.
+set(O3DE_COMPILE_OPTION_DISABLE_DEPRECATED_ENUM_ENUM_CONVERSION PRIVATE -Wno-deprecated-enum-enum-conversion -Wno-enum-enum-conversion)
 
 # If (USE_FAST_MATH) is set, then enable fast math optimizations.
 # Some targets might need to disable fast math individually (likely 3rd Party libraries)
@@ -57,12 +58,17 @@ ly_append_configurations_options(
         _FORTIFY_SOURCE=2
     DEFINES_RELEASE
         _FORTIFY_SOURCE=2
+
     COMPILATION
         -fno-exceptions
         -fvisibility=hidden
         -fvisibility-inlines-hidden
         -Wall
         -Werror
+        # Fedora RPM build: clang 21+ promoted these to errors; demote
+        # back to warnings so upstream -Werror doesn't fail the build.
+        -Wno-error=deprecated-volatile
+        -Wno-error=character-conversion
 
         ###################
         # Disabled warnings (please do not disable any others without first consulting sig-build)
@@ -72,32 +78,23 @@ ly_append_configurations_options(
             # was done to fix all hits. Leaving this disabled until there is a matching warning in MSVC.
 
         -Wrange-loop-analysis
-        -Wno-unknown-warning-option # used as a way to mark warnings that are MSVC only
+        -Wno-dllexport-explicit-instantiation-decl  # explicit instantiation declaration should not be 'dllexport'
         -Wno-parentheses
         -Wno-reorder
         -Wno-switch
         -Wno-undefined-var-template
-        -Wno-dllexport-explicit-instantiation-decl  # explicit instantiation declaration should not be 'dllexport'
-
-        ###################
-        # Enabled warnings (that are disabled by default)
-        ###################
-
+        -Wno-unknown-warning-option # used as a way to mark warnings that are MSVC only
     COMPILATION_DEBUG
         -O0                         # No optimization
         -g                          # debug symbols
         -fno-inline                 # don't inline functions
-
         -fstack-protector-all       # Enable stack protectors for all functions
         -fstack-check
-
     COMPILATION_PROFILE
         -O2
         -g                          # debug symbols
-
         -fstack-protector-all       # Enable stack protectors for all functions
         -fstack-check
-
     COMPILATION_RELEASE
         -O2
 )
@@ -107,10 +104,11 @@ if(LY_BUILD_WITH_ADDRESS_SANITIZER)
         COMPILATION_DEBUG
             -fsanitize=address
             -fno-omit-frame-pointer
+
         LINK_NON_STATIC_DEBUG
             -shared-libsan
             -fsanitize=address
     )
 endif()
-include(cmake/Platform/Common/TargetIncludeSystemDirectories_supported.cmake)
 
+include(cmake/Platform/Common/TargetIncludeSystemDirectories_supported.cmake)

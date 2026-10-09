@@ -171,7 +171,7 @@ void ConnectionWorker::SendMessage(unsigned int type, unsigned int serial, QByte
     AssetProcessor::Message message;
     message.header.type = type;
     message.header.serial = serial;
-    message.header.size = payload.size();
+    message.header.size = static_cast<int>(payload.size());
     message.payload = payload;
     WriteMessage(m_engineSocket, message);
 }
@@ -188,7 +188,7 @@ namespace Detail
         {
             message.header.type = negotiation.GetMessageType();
             message.header.serial = serial;
-            message.header.size = message.payload.size();
+            message.header.size = static_cast<int>(message.payload.size());
             return worker->WriteMessage(socket, message);
         }
         return false;
@@ -443,7 +443,7 @@ void ConnectionWorker::EngineSocketStateChanged(QAbstractSocket::SocketState soc
         AZ_TracePrintf(AssetProcessor::DebugChannel, "ConnectionWorker::EngineSocketStateChanged:  %p unconnected, now (%s)", this, m_engineSocketIsConnected ? "True" : "False");
 
 #endif
-        disconnect(&m_engineSocket, &QTcpSocket::readyRead, 0, 0);
+        disconnect(&m_engineSocket, &QTcpSocket::readyRead, nullptr, nullptr);
         DisconnectSockets();
     }
 }

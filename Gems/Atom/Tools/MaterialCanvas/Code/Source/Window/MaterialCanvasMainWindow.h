@@ -8,7 +8,6 @@
 
 #pragma once
 
-#if !defined(Q_MOC_RUN)
 #include <AtomToolsFramework/Document/AtomToolsDocumentInspector.h>
 #include <AtomToolsFramework/Document/AtomToolsDocumentMainWindow.h>
 #include <AtomToolsFramework/EntityPreviewViewport/EntityPreviewViewportSettingsInspector.h>
@@ -23,7 +22,6 @@
 #include <GraphCanvas/Widgets/NodePalette/NodePaletteWidget.h>
 
 #include <QTranslator>
-#endif
 
 namespace MaterialCanvas
 {
@@ -37,7 +35,7 @@ namespace MaterialCanvas
         using Base = AtomToolsFramework::AtomToolsDocumentMainWindow;
 
         MaterialCanvasMainWindow(
-            const AZ::Crc32& toolId, AtomToolsFramework::GraphViewSettingsPtr graphViewSettingsPtr, QWidget* parent = 0);
+            const AZ::Crc32& toolId, AtomToolsFramework::GraphViewSettingsPtr graphViewSettingsPtr, QWidget* parent = nullptr);
         ~MaterialCanvasMainWindow() = default;
 
     protected:

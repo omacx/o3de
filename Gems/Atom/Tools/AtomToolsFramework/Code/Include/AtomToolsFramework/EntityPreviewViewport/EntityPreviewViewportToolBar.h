@@ -8,13 +8,11 @@
 
 #pragma once
 
-#if !defined(Q_MOC_RUN)
 #include <AtomToolsFramework/AssetSelection/AssetSelectionComboBox.h>
 #include <AtomToolsFramework/EntityPreviewViewport/EntityPreviewViewportSettingsNotificationBus.h>
 
 #include <QAction>
 #include <QToolBar>
-#endif
 
 namespace AtomToolsFramework
 {
@@ -25,7 +23,7 @@ namespace AtomToolsFramework
     {
         Q_OBJECT
     public:
-        EntityPreviewViewportToolBar(const AZ::Crc32& toolId, QWidget* parent = 0);
+        EntityPreviewViewportToolBar(const AZ::Crc32& toolId, QWidget* parent = nullptr);
         ~EntityPreviewViewportToolBar();
 
     private:

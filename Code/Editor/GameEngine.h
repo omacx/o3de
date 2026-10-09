@@ -10,20 +10,20 @@
 // Description : The game engine for editor
 #pragma once
 
-#if !defined(Q_MOC_RUN)
-#include <AzCore/Outcome/Outcome.h>
+#include "IEditor.h"
+#include "ISystem.h"
 #include "LogFile.h"
+#include "SandboxAPI.h"
 #include "Util/ModalWindowDismisser.h"
-#endif
-
-class CStartupLogoDialog;
-struct IInitializeUIInfo;
 
 #include <AzCore/Interface/Interface.h>
 #include <AzCore/Math/Matrix3x4.h>
 #include <AzCore/Math/Vector3.h>
-
 #include <AzCore/Module/DynamicModuleHandle.h>
+#include <AzCore/Outcome/Outcome.h>
+
+class CStartupLogoDialog;
+struct IInitializeUIInfo;
 
 class ThreadedOnErrorHandler : public QObject
 {
@@ -53,7 +53,7 @@ public:
         bool bTestMode,
         const char* sCmdLine,
         IInitializeUIInfo* logo,
-        HWND hwndForInputSystem);
+        void* hwndForInputSystem);
     //! Initialize game.
     //! @return true if initialization succeeded, false otherwise
     bool InitGame(const char* sGameDLL);

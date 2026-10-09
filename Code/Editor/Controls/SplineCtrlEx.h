@@ -6,12 +6,8 @@
  *
  */
 
-
-#ifndef CRYINCLUDE_EDITOR_CONTROLS_SPLINECTRLEX_H
-#define CRYINCLUDE_EDITOR_CONTROLS_SPLINECTRLEX_H
 #pragma once
 
-#if !defined(Q_MOC_RUN)
 #include <ISplines.h>
 #include "Controls/WndGridHelper.h"
 #include "IKeyTimeSet.h"
@@ -19,7 +15,6 @@
 #include <Util/EditorUtils.h>
 #include <QWidget>
 #include <Range.h>
-#endif
 
 // Custom styles for this control.
 #define SPLINE_STYLE_NOGRID 0x0001
@@ -121,7 +116,7 @@ public:
 
     float SnapTimeToGridVertical(float time);
 
-    void OnUserCommand(UINT cmd);
+    void OnUserCommand(unsigned int cmd);
     void FitSplineToViewWidth();
     void FitSplineToViewHeight();
     void FitSplineHeightToValueRange();
@@ -252,7 +247,7 @@ protected:
 
     virtual void captureMouseImpl() = 0;
     virtual void releaseMouseImpl() = 0;
-    virtual void setCursorImpl(UINT cursor) = 0;
+    virtual void setCursorImpl(unsigned int cursor) = 0;
 
     virtual ISplineCtrlUndo* CreateSplineCtrlUndoObject(std::vector<ISplineInterpolator*>& splineContainer);
 
@@ -411,10 +406,8 @@ protected:
 
     void captureMouseImpl() override { grabMouse(); }
     void releaseMouseImpl() override { releaseMouse(); }
-    void setCursorImpl(UINT cursor) override { setCursor(CMFCUtils::LoadCursor(cursor)); }
+    void setCursorImpl(unsigned int cursor) override { setCursor(CMFCUtils::LoadCursor(cursor)); }
 
 protected:
     QRubberBand* m_rubberBand;
 };
-
-#endif // CRYINCLUDE_EDITOR_CONTROLS_SPLINECTRLEX_H

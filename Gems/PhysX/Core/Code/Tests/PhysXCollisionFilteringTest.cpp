@@ -33,7 +33,7 @@ namespace PhysX
         const AZStd::string RightCollider = "RightCollider";
         const int FramesToUpdate = 25;
 
-        void SetUp() override 
+        void SetUp() override
         {
             PhysXDefaultWorldTest::SetUp();
 
@@ -88,7 +88,7 @@ namespace PhysX
         auto leftColliderConfig = AZStd::make_shared<Physics::ColliderConfiguration>();
         leftColliderConfig->m_position = AZ::Vector3(-1.0f, 0.0f, 0.0f);
         leftColliderConfig->m_tag = leftColliderTag;
-        
+
         auto rightBoxConfig = AZStd::make_shared<Physics::BoxShapeConfiguration>();
         auto rightColliderConfig = AZStd::make_shared<Physics::ColliderConfiguration>();
         rightColliderConfig->m_position = AZ::Vector3(1.0f, 0.0f, 0.0f);
@@ -104,7 +104,7 @@ namespace PhysX
 
         entityPtr->Init();
         entityPtr->Activate();
-        return AZStd::move(entityPtr);
+        return entityPtr;
     }
 
     TEST_F(PhysXCollisionFilteringTest, TestSetColliderLayerOnStaticObject)
@@ -136,6 +136,23 @@ namespace PhysX
         TestUtils::UpdateScene(m_defaultScene, AzPhysics::SystemConfiguration::DefaultFixedTimestep, FramesToUpdate);
 
         EXPECT_TRUE(collisionEvents.m_beginCollisions.empty());
+    }
+
+    TEST_F(PhysXCollisionFilteringTest, SameCollisionGroupSameLayerCollide)
+    {
+        auto stationaryBox = TestUtils::CreateStaticBoxEntity(m_testSceneHandle, AZ::Vector3::CreateZero(), AZ::Vector3(10.0f, 10.0f, 0.5f));
+        auto fallingBox = TestUtils::CreateBoxEntity(m_testSceneHandle, AZ::Vector3(0.0f, 0.0f, 1.0f), AZ::Vector3(1.0f, 1.0f, 1.0f));
+
+        TestUtils::SetCollisionLayer(stationaryBox, LayerA);
+        TestUtils::SetCollisionLayer(fallingBox, LayerA);
+        TestUtils::SetCollisionGroup(stationaryBox, GroupA);
+        TestUtils::SetCollisionGroup(fallingBox, GroupA);
+
+        CollisionCallbacksListener collisionEvents(fallingBox->GetId());
+
+        TestUtils::UpdateScene(m_defaultScene, AzPhysics::SystemConfiguration::DefaultFixedTimestep, FramesToUpdate);
+
+        EXPECT_FALSE(collisionEvents.m_beginCollisions.empty());
     }
 
     TEST_F(PhysXCollisionFilteringTest, TestSetCollidesWithGroupOnDynamicObject)

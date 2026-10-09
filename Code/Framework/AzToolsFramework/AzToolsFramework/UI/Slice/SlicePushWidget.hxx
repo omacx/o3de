@@ -10,7 +10,6 @@
 
 #include <AzToolsFramework/AzToolsFrameworkAPI.h>
 
-#if !defined(Q_MOC_RUN)
 #include <QCheckBox>
 #include <QWidget>
 #include <QIcon>
@@ -21,7 +20,6 @@
 
 #include <AzToolsFramework/API/ToolsApplicationAPI.h>
 #include <AzToolsFramework/Slice/SliceUtilities.h>
-#endif
 
 class QTreeWidget;
 class QTreeWidgetItem;
@@ -123,7 +121,7 @@ namespace AzToolsFramework
          * \param entities - set of entity Ids to analyze/push.
          * \param config - Configuration for the SlicePush, in order to handle different types of entities/slices
          */
-        explicit SlicePushWidget(const EntityIdList& entities, const SlicePushWidgetConfigPtr& config, AZ::SerializeContext* serializeContext, QWidget* parent = 0);
+        explicit SlicePushWidget(const EntityIdList& entities, const SlicePushWidgetConfigPtr& config, AZ::SerializeContext* serializeContext, QWidget* parent = nullptr);
         ~SlicePushWidget() override;
 
         //////////////////////////////////////////////////////////////////////////

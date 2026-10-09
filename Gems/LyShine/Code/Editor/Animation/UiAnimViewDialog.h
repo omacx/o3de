@@ -9,7 +9,6 @@
 
 #pragma once
 
-#if !defined(Q_MOC_RUN)
 #include <LyShine/Animation/IUiAnimation.h>
 #include "UiEditorAnimationBus.h"
 #include "UiAnimViewNodes.h"
@@ -19,7 +18,6 @@
 #include "Undo/IUndoManagerListener.h"
 
 #include <QMainWindow>
-#endif
 
 class QSplitter;
 class QComboBox;
@@ -49,7 +47,7 @@ class CUiAnimViewDialog
 public:
     friend CUiAnimationCallback;
 
-    CUiAnimViewDialog(QWidget* pParent = NULL);
+    CUiAnimViewDialog(QWidget* pParent = nullptr);
     ~CUiAnimViewDialog();
 
     static CUiAnimViewDialog* GetCurrentInstance() { return s_pUiAnimViewDialog; }
@@ -163,7 +161,7 @@ private:
     void OnAddEntityNodeMenu();
 
     void OnEditorNotifyEvent(EEditorNotifyEvent event) override;
-    BOOL OnInitDialog();
+    bool OnInitDialog();
 
     void SaveLayouts();
     void SaveMiscSettings() const;

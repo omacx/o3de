@@ -41,7 +41,6 @@ set(FILES
     Include/Atom/Feature/DisplayMapper/DisplayMapperFeatureProcessorInterface.h
     Include/Atom/Feature/ImGui/ImGuiUtils.h
     Include/Atom/Feature/ImGui/SystemBus.h
-    Include/Atom/Feature/ImGui/ImGuiPass.h
     Include/Atom/Feature/ImageBasedLights/ImageBasedLightFeatureProcessorInterface.h
     Include/Atom/Feature/LightingChannel/LightingChannelConfiguration.h
     Include/Atom/Feature/Material/ConvertEmissiveUnitFunctor.h
@@ -72,6 +71,13 @@ set(FILES
     Include/Atom/Feature/ParamMacros/StartParamFunctionsVirtual.inl
     Include/Atom/Feature/ParamMacros/StartParamMembers.inl
     Include/Atom/Feature/ParamMacros/StartParamSerializeContext.inl
+    Include/Atom/Feature/PostProcess/AmbientOcclusion/SsaoConstants.h
+    Include/Atom/Feature/PostProcess/AmbientOcclusion/SsaoParams.inl
+    Include/Atom/Feature/PostProcess/AmbientOcclusion/GtaoConstants.h
+    Include/Atom/Feature/PostProcess/AmbientOcclusion/GtaoParams.inl
+    Include/Atom/Feature/PostProcess/AmbientOcclusion/AoConstants.h
+    Include/Atom/Feature/PostProcess/AmbientOcclusion/AoParams.inl
+    Include/Atom/Feature/PostProcess/AmbientOcclusion/AoSettingsInterface.h
     Include/Atom/Feature/PostProcess/Bloom/BloomConstants.h
     Include/Atom/Feature/PostProcess/Bloom/BloomParams.inl
     Include/Atom/Feature/PostProcess/Bloom/BloomSettingsInterface.h
@@ -102,9 +108,6 @@ set(FILES
     Include/Atom/Feature/PostProcess/PostProcessParams.inl
     Include/Atom/Feature/PostProcess/PostProcessSettings.inl
     Include/Atom/Feature/PostProcess/PostProcessSettingsInterface.h
-    Include/Atom/Feature/PostProcess/Ssao/SsaoConstants.h
-    Include/Atom/Feature/PostProcess/Ssao/SsaoParams.inl
-    Include/Atom/Feature/PostProcess/Ssao/SsaoSettingsInterface.h
     Include/Atom/Feature/PostProcess/Vignette/VignetteConstants.h
     Include/Atom/Feature/PostProcess/Vignette/VignetteParams.inl
     Include/Atom/Feature/PostProcess/Vignette/VignetteSettingsInterface.h
@@ -165,5 +168,4 @@ set(FILES
     Source/Utils/GpuBufferHandler.cpp
     Source/Utils/LightingPreset.cpp
     Source/Utils/ModelPreset.cpp
-    Source/ImGui/ImGuiPass.cpp
 )

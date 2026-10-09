@@ -9,12 +9,8 @@
 
 #pragma once
 
-// UiAnimViewFindDlg.h : header file
-//
-#if !defined(Q_MOC_RUN)
 #include <QDialog>
 #include <QScopedPointer>
-#endif
 
 class CUiAnimViewDialog;
 
@@ -30,7 +26,7 @@ class CUiAnimViewFindDlg
     Q_OBJECT
     // Construction
 public:
-    CUiAnimViewFindDlg(const char* title = NULL, QWidget* pParent = NULL);   // standard constructor
+    CUiAnimViewFindDlg(const char* title = nullptr, QWidget* pParent = nullptr);   // standard constructor
     ~CUiAnimViewFindDlg();
 
     //Functions

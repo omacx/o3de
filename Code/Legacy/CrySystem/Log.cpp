@@ -146,19 +146,19 @@ CLog::CLog(ISystem* pSystem)
     memset(m_sBackupFilename, 0, MAX_FILENAME_SIZE);
     //memset(m_szTemp,0,MAX_TEMP_LENGTH_SIZE);
     m_pSystem = pSystem;
-    m_pLogVerbosity = 0;
-    m_pLogWriteToFile = 0;
-    m_pLogWriteToFileVerbosity = 0;
-    m_pLogVerbosityOverridesWriteToFile = 0;
-    m_pLogSpamDelay = 0;
-    m_pLogModule = 0;
+    m_pLogVerbosity = nullptr;
+    m_pLogWriteToFile = nullptr;
+    m_pLogWriteToFileVerbosity = nullptr;
+    m_pLogVerbosityOverridesWriteToFile = nullptr;
+    m_pLogSpamDelay = nullptr;
+    m_pLogModule = nullptr;
     m_fLastLoadingUpdateTime = -1.f;    // for streaming engine update
     m_backupLogs = true;
 
 #if defined(SUPPORT_LOG_IDENTER)
     m_indentation = 0;
     BuildIndentString();
-    m_topIndenter = NULL;
+    m_topIndenter = nullptr;
 #endif
 
     m_nMainThreadId = AZStd::this_thread::get_id();
@@ -244,11 +244,11 @@ CLog::~CLog()
 
 void CLog::UnregisterConsoleVariables()
 {
-    m_pLogVerbosity = 0;
-    m_pLogWriteToFile = 0;
-    m_pLogWriteToFileVerbosity = 0;
-    m_pLogVerbosityOverridesWriteToFile = 0;
-    m_pLogSpamDelay = 0;
+    m_pLogVerbosity = nullptr;
+    m_pLogWriteToFile = nullptr;
+    m_pLogWriteToFileVerbosity = nullptr;
+    m_pLogVerbosityOverridesWriteToFile = nullptr;
+    m_pLogSpamDelay = nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -323,7 +323,7 @@ void CLog::LogWarning(const char* szFormat, ...)
     va_list ArgList;
     char        szBuffer[MAX_WARNING_LENGTH];
     va_start(ArgList, szFormat);
-    vsnprintf_s(szBuffer, sizeof(szBuffer), sizeof(szBuffer) - 1, szFormat, ArgList);
+    azvsnprintf(szBuffer, sizeof(szBuffer) - 1, szFormat, ArgList);
     szBuffer[sizeof(szBuffer) - 1] = '\0';
     va_end(ArgList);
 
@@ -343,7 +343,7 @@ void CLog::LogError(const char* szFormat, ...)
     va_list ArgList;
     char        szBuffer[MAX_WARNING_LENGTH];
     va_start(ArgList, szFormat);
-    vsnprintf_s(szBuffer, sizeof(szBuffer), sizeof(szBuffer) - 1, szFormat, ArgList);
+    azvsnprintf(szBuffer, sizeof(szBuffer) - 1, szFormat, ArgList);
     szBuffer[sizeof(szBuffer) - 1] = '\0';
     va_end(ArgList);
 
@@ -539,7 +539,7 @@ void CLog::LogV(const ELogType type, [[maybe_unused]] int flags, const char* szF
 #if defined(AZ_RESTRICTED_SECTION_IMPLEMENTED)
 #undef AZ_RESTRICTED_SECTION_IMPLEMENTED
 #else
-        int count = vsnprintf_s(szString, bufferlen, bufferlen - 1, szCommand, args);
+        int count = azvsnprintf(szString, bufferlen - 1, szCommand, args);
 #endif
         if (count == -1 || count >= bufferlen)
         {
@@ -957,7 +957,7 @@ void CLog::LogAppendWithPrevLine(const char* szFormat, ...)
 
     char szTemp[MAX_TEMP_LENGTH_SIZE];
     va_start(arglist, szFormat);
-    vsnprintf_s(szTemp, sizeof(szTemp), sizeof(szTemp) - 1, szCommand, arglist);
+    azvsnprintf(szTemp, sizeof(szTemp) - 1, szCommand, arglist);
     szTemp[sizeof(szTemp) - 1] = 0;
     va_end(arglist);
 
@@ -1045,7 +1045,7 @@ void CLog::LogToConsole(const char* szFormat, ...)
 
     char szBuffer[MAX_WARNING_LENGTH];
     va_start(arglist, szFormat);
-    vsnprintf_s(szBuffer, sizeof(szBuffer), sizeof(szBuffer) - 1, szCommand, arglist);
+    azvsnprintf(szBuffer, sizeof(szBuffer) - 1, szCommand, arglist);
     szBuffer[sizeof(szBuffer) - 1] = 0;
     va_end(arglist);
 
@@ -1081,7 +1081,7 @@ void CLog::LogToConsoleAppendWithPrevLine(const char* szFormat, ...)
 
     char szTemp[MAX_TEMP_LENGTH_SIZE];
     va_start(arglist, szFormat);
-    vsnprintf_s(szTemp, sizeof(szTemp), sizeof(szTemp) - 1, szCommand, arglist);
+    azvsnprintf(szTemp, sizeof(szTemp) - 1, szCommand, arglist);
     szTemp[sizeof(szTemp) - 1] = 0;
     va_end(arglist);
 
@@ -1457,8 +1457,8 @@ void CLog::CreateBackupFile() const
     AZStd::string sFileWithoutExt = PathUtil::GetFileName(m_szFilename);
 
     {
-        assert(::strstr(sFileWithoutExt.c_str(), ":") == 0);
-        assert(::strstr(sFileWithoutExt.c_str(), "\\") == 0);
+        assert(::strstr(sFileWithoutExt.c_str(), ":") == nullptr);
+        assert(::strstr(sFileWithoutExt.c_str(), "\\") == nullptr);
     }
 
     PathUtil::RemoveExtension(sFileWithoutExt);

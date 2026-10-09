@@ -7,7 +7,6 @@
  */
 #pragma once
 
-#if !defined(Q_MOC_RUN)
 #include <AzCore/Component/EntityId.h>
 #include <AzCore/std/containers/vector.h>
 #include <AzCore/std/string/string.h>
@@ -16,7 +15,6 @@
 #include <AzToolsFramework/UI/PropertyEditor/PropertyEditorAPI.h>
 
 #include <QWidget>
-#endif
 
 class QComboBox;
 
@@ -26,7 +24,7 @@ class PropertyEntityIdComboBoxCtrl : public QWidget
 public:
     AZ_CLASS_ALLOCATOR(PropertyEntityIdComboBoxCtrl, AZ::SystemAllocator);
 
-    PropertyEntityIdComboBoxCtrl(QWidget* pParent = NULL);
+    PropertyEntityIdComboBoxCtrl(QWidget* pParent = nullptr);
     virtual ~PropertyEntityIdComboBoxCtrl() = default;
 
     AZ::EntityId value() const;

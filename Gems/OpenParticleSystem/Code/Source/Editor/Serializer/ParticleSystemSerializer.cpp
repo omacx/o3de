@@ -549,9 +549,22 @@ namespace OpenParticle
             {
                 destField = AZ::Data::AssetManager::Instance().FindOrCreateAsset<T>(resultId, loadBehavior);
             }
+            else
+            {
+                // Preserve the original path string even when the asset catalog
+                // does not yet know about the referenced asset (cold cache).
+                // Without this, downstream builders that walk this object's
+                // references at CreateJobs time (notably ParticleBuilder for
+                // emitter material refs) lose the path information and cannot
+                // declare a JobDependency, which causes the dependent's job to
+                // be scheduled before its upstream dep is baked and fail with a
+                // generic "no material assigned to render" error on the first
+                // pass. A second AP pass then succeeds against the warmed cache.
+                destField.SetHint(sourceAssetPath);
+            }
         }
 
-        if (destField.GetId().IsValid())
+        if (destField.GetId().IsValid() || !destField.GetHint().empty())
         {
             return JSR::ResultCode(JSR::Tasks::ReadField, JSR::Outcomes::Success);
         }
@@ -580,6 +593,19 @@ namespace OpenParticle
 
         AZ::Data::AssetLoadBehavior loadBehavior = AZ::Data::AssetLoadBehavior::PreLoad;
         resultCode.Combine(ConvertSourceFileNameToAsset(emitInfo->m_material, inputValue, "material", loadBehavior, context));
+
+        // Optional. Particle files authored before per-emitter material overrides existed simply have no
+        // "materialOverrides" member and load with an empty map.
+        if (inputValue.IsObject() && inputValue.HasMember("materialOverrides"))
+        {
+            resultCode.Combine(ContinueLoadingFromJsonObjectField(
+                &emitInfo->m_materialOverrides,
+                azrtti_typeid<MaterialPropertyOverrideMap>(),
+                inputValue,
+                "materialOverrides",
+                context));
+        }
+
         resultCode.Combine(ConvertSourceFileNameToAsset(emitInfo->m_model, inputValue, "model", loadBehavior, context));
         resultCode.Combine(ConvertSourceFileNameToAsset(emitInfo->m_skeletonModel, inputValue, "skeleton model", loadBehavior, context));
 
@@ -689,13 +715,28 @@ namespace OpenParticle
             {
                 // we don't actually have to load the asset, just want to place it into a struct for serialize.
                 mat = AZ::Data::AssetManager::Instance().GetAsset<AZ::RPI::MaterialAsset>(
-                    defaultSpriteEmitMaterialId, AZ::Data::AssetLoadBehaviorNamespace::NoLoad);
+                    // PreLoad to match the load path, so the behaviour written to the file agrees with the
+                    // behaviour the asset is given when it is read back.
+                    defaultSpriteEmitMaterialId, AZ::Data::AssetLoadBehavior::PreLoad);
             }
         }
 
         auto materialAssetType = azrtti_typeid<AZ::Data::Asset<AZ::RPI::MaterialAsset>>();
         auto modelAssetType = azrtti_typeid<AZ::Data::Asset<AZ::RPI::ModelAsset>>();
         resultCode.Combine(ContinueStoringToJsonObjectField(outputValue, "material", &mat, nullptr, materialAssetType, context));
+
+        // Only written when the emitter actually overrides something, so untouched particle files stay byte
+        // identical to what they were before this feature existed.
+        if (!info->m_materialOverrides.empty())
+        {
+            resultCode.Combine(ContinueStoringToJsonObjectField(
+                outputValue,
+                "materialOverrides",
+                &info->m_materialOverrides,
+                nullptr,
+                azrtti_typeid<MaterialPropertyOverrideMap>(),
+                context));
+        }
 
         if (info->m_model.GetId().IsValid())
         {

@@ -10,10 +10,7 @@
 
 
 #include <AzToolsFramework/AzToolsFrameworkAPI.h>
-
-#if !defined(Q_MOC_RUN)
 #include <AzToolsFramework/UI/PropertyEditor/PropertyIntCtrlCommon.h>
-#endif
 
 namespace AzQtComponents
 {
@@ -29,7 +26,7 @@ namespace AzToolsFramework
     public:
         AZ_CLASS_ALLOCATOR(PropertyIntSpinCtrl, AZ::SystemAllocator);
 
-        PropertyIntSpinCtrl(QWidget* parent = NULL);
+        PropertyIntSpinCtrl(QWidget* parent = nullptr);
         virtual ~PropertyIntSpinCtrl();
 
     public slots:
@@ -55,6 +52,8 @@ namespace AzToolsFramework
     signals:
         void valueChanged(AZ::s64 newValue);
         void editingFinished();
+        void valueChangeBegan();
+        void valueChangeEnded();
 
     private:
         AzQtComponents::SpinBox* m_pSpinBox;

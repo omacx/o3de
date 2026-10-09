@@ -32,7 +32,6 @@ namespace EditorPythonBindingsUnitTests
 {
     using ::testing::NiceMock;
     using ::testing::Return;
-    using ::testing::Invoke;
     using ::testing::A;
     using ::testing::_;
 
@@ -48,7 +47,7 @@ namespace EditorPythonBindingsUnitTests
         {
             m_cvarType = cvarType;
             ON_CALL(m_cvarMock, GetType()).WillByDefault(Return(m_cvarType));
-            ON_CALL(m_cvarMock, Set(A<T>())).WillByDefault(Invoke(func));
+            ON_CALL(m_cvarMock, Set(A<T>())).WillByDefault(func);
             ON_CALL(m_console, GetCVar(_)).WillByDefault(Return(&m_cvarMock));
             ON_CALL(m_system, GetIConsole()).WillByDefault(Return(&m_console));
             ON_CALL(m_editorMock, GetSystem()).WillByDefault(Return(&m_system));
@@ -220,7 +219,7 @@ namespace EditorPythonBindingsUnitTests
             args[0].Set(&testCvar);
             args[1].Set(&intArg);
 
-            context->m_methods.find("set_cvar_integer")->second->Call(args.begin(), static_cast<unsigned int>(args.size()));
+            context->m_methods.find("set_cvar_integer")->second->Call(args.data(), static_cast<unsigned int>(args.size()));
             EXPECT_EQ(1, testInt);
         });
     }
@@ -239,7 +238,7 @@ namespace EditorPythonBindingsUnitTests
             args[0].Set(&testCvar);
             args[1].Set(&input);
 
-            context->m_methods.find("set_cvar_float")->second->Call(args.begin(), static_cast<unsigned int>(args.size()));
+            context->m_methods.find("set_cvar_float")->second->Call(args.data(), static_cast<unsigned int>(args.size()));
             EXPECT_FLOAT_EQ(1.234f, testFloat);
         });
     }
@@ -258,7 +257,7 @@ namespace EditorPythonBindingsUnitTests
             args[0].Set(&testCvar);
             args[1].Set(&input);
 
-            context->m_methods.find("set_cvar_string")->second->Call(args.begin(), static_cast<unsigned int>(args.size()));
+            context->m_methods.find("set_cvar_string")->second->Call(args.data(), static_cast<unsigned int>(args.size()));
             EXPECT_STREQ("testvalue", testString.c_str());
         });
     }
@@ -282,7 +281,7 @@ namespace EditorPythonBindingsUnitTests
             AZ::BehaviorArgument result;
             result.Set(&obj);
 
-            context->m_methods.find("get_cvar")->second->Call(args.begin(), static_cast<unsigned int>(args.size()), &result);
+            context->m_methods.find("get_cvar")->second->Call(args.data(), static_cast<unsigned int>(args.size()), &result);
             EXPECT_STREQ("atestvalue", reinterpret_cast<const char*>(obj.m_address));
         });
     }
@@ -294,13 +293,13 @@ namespace EditorPythonBindingsUnitTests
             AZStd::string data;
             MockEditor mockEditor;
             mockEditor.PrepareGetIConsole();
-            ON_CALL(mockEditor.m_console, ExecuteString(_,_,_)).WillByDefault(Invoke([&data](const char* command, const bool, const bool) { data = command; }));
+            ON_CALL(mockEditor.m_console, ExecuteString(_,_,_)).WillByDefault([&data](const char* command, const bool, const bool) { data = command; });
 
             const char* testCvar = "enable_feature game.sim";
             AZStd::array<AZ::BehaviorArgument, 1> args;
             args[0].Set(&testCvar);
 
-            context->m_methods.find("run_console")->second->Call(args.begin(), static_cast<unsigned int>(args.size()));
+            context->m_methods.find("run_console")->second->Call(args.data(), static_cast<unsigned int>(args.size()));
             EXPECT_STREQ(testCvar, data.c_str());
         });
     }

@@ -11,12 +11,11 @@
 
 #include <AzToolsFramework/AzToolsFrameworkAPI.h>
 
-#if !defined(Q_MOC_RUN)
 #include <AzCore/base.h>
 #include <AzCore/Memory/SystemAllocator.h>
 #include <QWidget>
+
 #include "PropertyEditorAPI.h"
-#endif
 
 namespace AzQtComponents
 {
@@ -32,7 +31,7 @@ namespace AzToolsFramework
     public:
         AZ_CLASS_ALLOCATOR(PropertyDoubleSpinCtrl, AZ::SystemAllocator);
 
-        PropertyDoubleSpinCtrl(QWidget* pParent = NULL);
+        PropertyDoubleSpinCtrl(QWidget* pParent = nullptr);
         virtual ~PropertyDoubleSpinCtrl();
 
         double value() const;
@@ -51,6 +50,8 @@ namespace AzToolsFramework
     signals:
         void valueChanged(double newValue);
         void editingFinished();
+        void valueChangeBegan();
+        void valueChangeEnded();
 
     public slots:
         void setValue(double val);

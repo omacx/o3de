@@ -8,9 +8,7 @@
 
 #pragma once
 
-#if !defined(Q_MOC_RUN)
 #include <native/utilities/ApplicationServer.h>
-#endif
 
 /** This Class is responsible for listening and getting new connections
  */
@@ -19,7 +17,7 @@ class GUIApplicationServer
 {
     Q_OBJECT
 public:
-    explicit GUIApplicationServer(QObject* parent = 0);
+    explicit GUIApplicationServer(QObject* parent = nullptr);
     ~GUIApplicationServer() override;
 
     bool startListening(unsigned short port = 0) override;

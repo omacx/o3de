@@ -9,16 +9,14 @@
 
 #pragma once
 
-#if !defined(Q_MOC_RUN)
 #include "UiAnimViewSequence.h"
 #include "UiAnimViewNode.h"
 #include "UiAnimViewDopeSheetBase.h"
 
-#include <QScopedPointer>
 #include <Controls/ReflectedPropertyControl/ReflectedPropertyCtrl.h>
 
+#include <QScopedPointer>
 #include <QDockWidget>
-#endif
 
 namespace Ui {
     class CUiAnimViewTrackPropsDlg;
@@ -69,7 +67,7 @@ protected:
     // Helper functions.
     //////////////////////////////////////////////////////////////////////////
     template <class T>
-    void SyncValue(CSmartVariable<T>& var, T& value, bool bCopyToUI, IVariable* pSrcVar = NULL)
+    void SyncValue(CSmartVariable<T>& var, T& value, bool bCopyToUI, IVariable* pSrcVar = nullptr)
     {
         if (bCopyToUI)
         {
@@ -121,7 +119,7 @@ class CUiAnimViewTrackPropsDlg
 {
     Q_OBJECT
 public:
-    CUiAnimViewTrackPropsDlg(QWidget* parent = 0);
+    CUiAnimViewTrackPropsDlg(QWidget* parent = nullptr);
     ~CUiAnimViewTrackPropsDlg();
 
     void OnSequenceChanged();

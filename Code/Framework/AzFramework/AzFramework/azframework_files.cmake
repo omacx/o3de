@@ -63,6 +63,7 @@ set(FILES
     Asset/AssetSystemComponent.cpp
     Asset/AssetSystemComponent.h
     Asset/GenericAssetHandler.h
+    Asset/GenericAssetHandler.cpp
     Asset/AssetBundleManifest.cpp
     Asset/AssetBundleManifest.h
     Asset/AssetCatalogBus.cpp
@@ -214,6 +215,9 @@ set(FILES
     IO/RemoteFileIO.h
     IO/RemoteStorageDrive.h
     IO/RemoteStorageDrive.cpp
+    Math/Easing.h
+    Math/EasingCurve.cpp
+    Math/EasingCurve.h
     Math/InterpolationSample.h
     Metrics/MetricsPlainTextNameRegistration.h
     Network/AssetProcessorConnection.cpp
@@ -417,6 +421,7 @@ set(FILES
     Terrain/TerrainDataRequestBus.cpp
     Thermal/ThermalInfo.cpp
     Thermal/ThermalInfo.h
+    Translation/TranslationDef.h
     Platform/PlatformDefaults.h
     Windowing/WindowBus.cpp
     Windowing/WindowBus.h

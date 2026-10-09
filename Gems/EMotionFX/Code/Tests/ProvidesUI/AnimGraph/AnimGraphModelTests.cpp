@@ -138,7 +138,10 @@ namespace EMotionFX
             case QtWarningMsg:
             case QtCriticalMsg:
             case QtFatalMsg:
-                if (msg.contains("has active key-value observers (KVO)! These will stop working now that the window is recreated, and will result in exceptions when the observers are removed"))
+                if (msg.contains(
+                        "has active key-value observers (KVO)! These will stop working now that the window is recreated, and will result "
+                        "in exceptions when the observers are removed") ||
+                    (msg.contains("ThemeChangeObserverWindow") && msg.contains("Class already exists")))
                 {
                     break;
                 }
@@ -312,7 +315,11 @@ namespace EMotionFX
 
             const QModelIndexList modelIndexes = GetModel()->FindModelIndexes(parameterNode);
             QList<QPersistentModelIndex> modelIndexesForParameterNode;
-            AZStd::copy(modelIndexes.begin(), modelIndexes.end(), AZStd::back_inserter(modelIndexesForParameterNode));
+            for (const QModelIndex& index : modelIndexes)
+            {
+                modelIndexesForParameterNode.push_back(index);
+            }
+
             EXPECT_THAT(modelIndexesForParameterNode.size(), Eq(2));
 
             const auto modelIndexIsValid = testing::Truly([](const QPersistentModelIndex& i) { return i.isValid(); });

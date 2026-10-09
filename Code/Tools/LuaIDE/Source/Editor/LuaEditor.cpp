@@ -33,8 +33,6 @@ int main(int argc, char* argv[])
         AZStd::unique_ptr<AZ::IO::LocalFileIO> fileIO = AZStd::unique_ptr<AZ::IO::LocalFileIO>(aznew AZ::IO::LocalFileIO());
         AZ::IO::FileIOBase::SetInstance(fileIO.get());
 
-        QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-        QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
         QCoreApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
         QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
         AzQtComponents::Utilities::HandleDpiAwareness(AzQtComponents::Utilities::PerScreenDpiAware);
@@ -48,7 +46,7 @@ int main(int argc, char* argv[])
         }
 
         LegacyFramework::ApplicationDesc desc(procName.toUtf8().data(), argc, argv);
-        desc.m_applicationModule = NULL;
+        desc.m_applicationModule = nullptr;
         desc.m_enableProjectManager = false;
 
 #if defined(EXTERNAL_CRASH_REPORTING)

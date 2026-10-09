@@ -8,7 +8,7 @@
 
 #include <AzCore/Serialization/SerializeContext.h>
 #include <AzCore/Serialization/EditContext.h>
-#include <ISystem.h>
+#include <AzFramework/Translation/TranslationDef.h>
 #include <LyShine/ILyShine.h>
 #include <LyShine/Bus/UiCanvasBus.h>
 #include <LyShine/Bus/UiCursorBus.h>
@@ -34,7 +34,9 @@ namespace MessagePopup
 
             if (AZ::EditContext* ec = serialize->GetEditContext())
             {
-                ec->Class<LyShineMessagePopup>("MessagePopup", "[Description of functionality provided by this System Component]")
+                ec->Class<LyShineMessagePopup>(
+                    QT_TRANSLATE_NOOP("MessagePopup", "MessagePopup"),
+                    QT_TRANSLATE_NOOP("MessagePopup", "[Description of functionality provided by this System Component]"))
                     ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
                     ->Attribute(AZ::Edit::Attributes::AutoExpand, true)
                     ;

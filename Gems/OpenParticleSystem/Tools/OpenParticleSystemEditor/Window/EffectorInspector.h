@@ -7,7 +7,7 @@
  */
 
 #pragma once
-#if !defined(Q_MOC_RUN)
+
 #include <Window/ui_EffectorInspector.h>
 #include <AzCore/Serialization/SerializeContext.h>
 #include <AzToolsFramework/UI/PropertyEditor/ReflectedPropertyEditor.hxx>
@@ -21,7 +21,6 @@
 #include <EventHandlerWidgets.h>
 #include <Document/ParticleDocumentBus.h>
 #include <AzCore/Math/Vector3.h>
-#endif
 
 namespace Ui
 {
@@ -90,6 +89,8 @@ namespace OpenParticleSystemEditor
         bool AfterSpawnRotationModified(AzToolsFramework::InstanceDataNode* pNode);
         bool AfterVector3Modifed(AzToolsFramework::InstanceDataNode* pNode, AZ::u8 classIndex, AZ::u8 moduleIndex);
 
+        void CheckWarningText();
+
     private:
         AZ::SerializeContext* m_serializeContext = nullptr;
         ComboBoxWidget* m_comboBoxWidget = nullptr;
@@ -103,6 +104,7 @@ namespace OpenParticleSystemEditor
 
     private Q_SLOTS:
         void OnComboBoxMaterialChanged();
+        void OnComboBoxMaterialPropertiesChanged(bool editingFinished);
         void OnComboBoxModelChanged();
         void OnComboBoxSkeletonModelChanged();
     };

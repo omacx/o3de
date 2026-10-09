@@ -40,8 +40,8 @@
 #include <AzFramework/API/ApplicationAPI.h>
 #include <AzFramework/Platform/PlatformDefaults.h>
 #include <AzToolsFramework/UI/Logging/LogLine.h>
-#include <xxhash/xxhash.h>
 #include <native/utilities/UuidManager.h>
+#include <xxhash.h>
 
 #if defined(AZ_PLATFORM_WINDOWS)
 #   include <windows.h>
@@ -474,7 +474,7 @@ namespace AssetUtilities
 
         // third parameter dwShareMode (0) prevents share access
         const DWORD dwShareMode = 0;
-        HANDLE fileHandle = CreateFileW(usableFileName.c_str(), GENERIC_READ, dwShareMode, nullptr, OPEN_EXISTING, 0, 0);
+        HANDLE fileHandle = CreateFileW(usableFileName.c_str(), GENERIC_READ, dwShareMode, nullptr, OPEN_EXISTING, 0, nullptr);
 
         if (fileHandle != INVALID_HANDLE_VALUE)
         {
@@ -748,7 +748,7 @@ namespace AssetUtilities
         QString normalizedPath = NormalizeFilePath(path);
         if (normalizedPath.startsWith("@"))
         {
-            int aliasEndIndex = normalizedPath.indexOf("@/", Qt::CaseInsensitive);
+            int aliasEndIndex = static_cast<int>(normalizedPath.indexOf("@/", Qt::CaseInsensitive));
             if (aliasEndIndex != -1)
             {
                 normalizedPath.remove(0, aliasEndIndex + 2);// adding two to remove both the percentage sign and the native separator
@@ -756,7 +756,7 @@ namespace AssetUtilities
             else
             {
                 //try finding the second % index than,maybe the path is like @SomeAlias@somefolder/somefile.ext
-                aliasEndIndex = normalizedPath.indexOf("@", 1, Qt::CaseInsensitive);
+                aliasEndIndex = static_cast<int>(normalizedPath.indexOf("@", 1, Qt::CaseInsensitive));
                 if (aliasEndIndex != -1)
                 {
                     normalizedPath.remove(0, aliasEndIndex + 1); //adding one to remove the percentage sign only
@@ -847,7 +847,7 @@ namespace AssetUtilities
         // from various APIs differently.  we will settle on upper case as the standard.
         if ((returnString.length() > 1) && (returnString.at(1) == ':'))
         {
-            QCharRef firstChar = returnString[0]; // QCharRef allows you to modify the string in place.
+            QChar& firstChar = returnString[0]; // QCharRef allows you to modify the string in place.
             firstChar = firstChar.toUpper();
         }
 #endif
@@ -1741,6 +1741,15 @@ namespace AssetUtilities
             else
             {
                 AppendLog(m_inException ? AzFramework::LogFile::SEV_EXCEPTION : AzFramework::LogFile::SEV_NORMAL, window, message);
+            }
+
+            // allow "AssetProcessor" log to escape builder threads for debugging
+            if (window)
+            {
+                if (strcmp(window, AssetProcessor::ConsoleChannel) == 0)
+                {
+                    return false;
+                }
             }
 
             return true;

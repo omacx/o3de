@@ -31,9 +31,6 @@
 #include <QScrollBar>
 #include <QStaticText>
 #include <QToolTip>
-#if defined(Q_OS_WIN)
-#include <QtWinExtras/QtWin>
-#endif
 
 #include <AzQtComponents/Components/Widgets/ColorPicker.h>
 
@@ -86,7 +83,7 @@ CUiAnimViewDopeSheetBase::CUiAnimViewDopeSheetBase(QWidget* parent)
     m_currentTime = 0.0f;
     m_storedTime = m_currentTime;
     m_rcSelect = QRect(0, 0, 0, 0);
-    m_rubberBand = 0;
+    m_rubberBand = nullptr;
     m_scrollBar = new QScrollBar(Qt::Horizontal, this);
     connect(m_scrollBar, &QScrollBar::valueChanged, this, &CUiAnimViewDopeSheetBase::OnHScroll);
     m_keyTimeOffset = 0;
@@ -110,7 +107,7 @@ CUiAnimViewDopeSheetBase::CUiAnimViewDopeSheetBase(QWidget* parent)
 
     m_bFastRedraw = false;
 
-    m_pLastTrackSelectedOnSpot = NULL;
+    m_pLastTrackSelectedOnSpot = nullptr;
 
 
 #ifdef DEBUG
@@ -529,22 +526,24 @@ void CUiAnimViewDopeSheetBase::OnLButtonUp(Qt::KeyboardModifiers modifiers, [[ma
         return;
     }
 
+    if (m_rubberBand)
+    {
+        m_rubberBand->deleteLater();
+        m_rubberBand = nullptr;
+    }
+
     if (m_mouseMode == eUiAVMouseMode_Select)
     {
         // Check if any key are selected.
         m_rcSelect.translate(-m_scrollOffset);
         SelectKeys(m_rcSelect, modifiers & Qt::ControlModifier);
         m_rcSelect = QRect();
-        m_rubberBand->deleteLater();
-        m_rubberBand = 0;
     }
     else if (m_mouseMode == eUiAVMouseMode_SelectWithinTime)
     {
         m_rcSelect.translate(-m_scrollOffset);
         SelectAllKeysWithinTimeFrame(m_rcSelect, modifiers & Qt::ControlModifier);
         m_rcSelect = QRect();
-        m_rubberBand->deleteLater();
-        m_rubberBand = 0;
     }
     else if (m_mouseMode == eUiAVMouseMode_DragTime)
     {
@@ -729,7 +728,7 @@ void CUiAnimViewDopeSheetBase::OnRButtonUp([[maybe_unused]] Qt::KeyboardModifier
 
     if (!m_bCursorWasInKey)
     {
-        const bool bHasCopiedKey = (GetKeysInClickboard() != NULL);
+        const bool bHasCopiedKey = (GetKeysInClickboard() != nullptr);
 
         if (bHasCopiedKey && m_bMouseMovedAfterRButtonDown == false)    // Once moved, it means the user wanted to scroll, so no paste pop-up.
         {
@@ -1135,24 +1134,24 @@ XmlNodeRef CUiAnimViewDopeSheetBase::GetKeysInClickboard()
     CClipboard clip(this);
     if (clip.IsEmpty())
     {
-        return NULL;
+        return nullptr;
     }
 
     if (clip.GetTitle() != "Track view keys")
     {
-        return NULL;
+        return nullptr;
     }
 
     XmlNodeRef copyNode = clip.Get();
-    if (copyNode == NULL || strcmp(copyNode->getTag(), "CopyKeysNode"))
+    if (copyNode == nullptr || strcmp(copyNode->getTag(), "CopyKeysNode"))
     {
-        return NULL;
+        return nullptr;
     }
 
     int nNumTracksToPaste = copyNode->getChildCount();
     if (nNumTracksToPaste == 0)
     {
-        return NULL;
+        return nullptr;
     }
 
     return copyNode;
@@ -2340,11 +2339,11 @@ void CUiAnimViewDopeSheetBase::DrawKeys(CUiAnimViewTrack* pTrack, QPainter* pain
                     // Show its time or frame number additionally.
                     if (GetTickDisplayMode() == eUiAVTickMode_InSeconds)
                     {
-                        sprintf_s(keydesc, "%.3f, {", time);
+                        azsprintf(keydesc, "%.3f, {", time);
                     }
                     else
                     {
-                        sprintf_s(keydesc, "%d, {", ftoi(time / m_snapFrameTime));
+                        azsprintf(keydesc, "%d, {", ftoi(time / m_snapFrameTime));
                     }
                 }
                 else
@@ -2651,7 +2650,7 @@ void CUiAnimViewDopeSheetBase::SetTickDisplayMode(EUiAVTickMode mode)
 }
 
 //////////////////////////////////////////////////////////////////////////
-void CUiAnimViewDopeSheetBase::SetSnapFPS(UINT fps)
+void CUiAnimViewDopeSheetBase::SetSnapFPS(unsigned int fps)
 {
     m_snapFrameTime = (fps == 0) ? 0.033333f : (1.0f / float(fps));
 }

@@ -8,10 +8,8 @@
 
 #pragma once
 
-#if !defined(Q_MOC_RUN)
 #include <QList>
 #include <QAbstractSocket>
-#endif
 
 class QTcpSocket;
 class QTcpServer;
@@ -26,7 +24,7 @@ class ControlRequestHandler : public QObject
 {
     Q_OBJECT
 public:
-    explicit ControlRequestHandler(ApplicationManagerBase* parent = 0);
+    explicit ControlRequestHandler(ApplicationManagerBase* parent = nullptr);
     ~ControlRequestHandler();
 
 public slots:

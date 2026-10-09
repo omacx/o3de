@@ -5,16 +5,11 @@
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
-#ifndef ABSTRACTGROUPPROXYMODEL_H
-#define ABSTRACTGROUPPROXYMODEL_H
 
-#if !defined(Q_MOC_RUN)
+#pragma once
+
 #include <QAbstractProxyModel>
-#endif
-
-#if !defined(Q_MOC_RUN)
 #include <QPixmap>
-#endif
 
 class AbstractGroupProxyModel
     : public QAbstractProxyModel
@@ -22,7 +17,7 @@ class AbstractGroupProxyModel
     Q_OBJECT
 
 public:
-    AbstractGroupProxyModel(QObject* parent = 0);
+    AbstractGroupProxyModel(QObject* parent = nullptr);
     ~AbstractGroupProxyModel();
 
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
@@ -69,8 +64,8 @@ private:
         }
     };
 
-    GroupItem* FindIndex(const QModelIndex& index, GroupItem* group = 0) const;
-    GroupItem* FindGroup(GroupItem* group, GroupItem* parent = 0) const;
+    GroupItem* FindIndex(const QModelIndex& index, GroupItem* group = nullptr) const;
+    GroupItem* FindGroup(GroupItem* group, GroupItem* parent = nullptr) const;
 
     void SourceRowsInserted(const QModelIndex& parent, int from, int to);
     void SourceRowsAboutToBeRemoved(const QModelIndex& parent, int from, int to);
@@ -80,5 +75,3 @@ private:
 
     GroupItem m_rootItem;
 };
-
-#endif // ABSTRACTGROUPPROXYMODEL_H

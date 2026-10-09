@@ -8,21 +8,19 @@
 
 #pragma once
 
+#include "PropertyEditorAPI.h"
 
 #include <AzToolsFramework/AzToolsFrameworkAPI.h>
 
-#if !defined(Q_MOC_RUN)
 #include <AzCore/base.h>
 #include <AzCore/Memory/SystemAllocator.h>
 #include <AzCore/Casting/numeric_cast.h>
-#include "PropertyEditorAPI.h"
 #include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Component/ComponentApplicationBus.h>
 
 #include <AzToolsFramework/UI/PropertyEditor/GenericComboBoxCtrl.h>
 
 #include <QWidget>
-#endif
 
 class QComboBox;
 class QLineEdit;
@@ -37,7 +35,7 @@ namespace AzToolsFramework
     public:
         AZ_CLASS_ALLOCATOR(PropertyEnumComboBoxCtrl, AZ::SystemAllocator);
 
-        PropertyEnumComboBoxCtrl(QWidget* pParent = NULL);
+        PropertyEnumComboBoxCtrl(QWidget* pParent = nullptr);
         virtual ~PropertyEnumComboBoxCtrl();
 
         AZ::s64 value() const;

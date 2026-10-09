@@ -10,9 +10,7 @@
 
 #include <AzToolsFramework/AzToolsFrameworkAPI.h>
 
-#if !defined(Q_MOC_RUN)
 #include <QDialog>
-#endif
 
 namespace Ui
 {
@@ -29,7 +27,7 @@ namespace AzToolsFramework
         {
             Q_OBJECT;
         public:
-            NewLogTabDialog(QWidget* pParent = 0);
+            NewLogTabDialog(QWidget* pParent = nullptr);
             ~NewLogTabDialog();
 
             QString m_windowName;

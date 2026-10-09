@@ -31,8 +31,7 @@ namespace AtomToolsFramework
         : QWidget(parent)
         , AzFramework::InputChannelEventListener(AzFramework::InputChannelEventListener::GetPriorityDefault())
     {
-        m_resizeEventCooldown.setSingleShot(true);
-        connect(&m_resizeEventCooldown, &QTimer::timeout, this, &RenderViewportWidget::SendWindowResizeEvent);
+        setMinimumSize(1, 1);
 
         if (shouldInitializeViewportContext)
         {
@@ -231,11 +230,11 @@ namespace AtomToolsFramework
     {
         switch (event->type()) 
         {
-            case QEvent::Resize: [[fallthrough]];
+            case QEvent::Resize:
 
             // This event exists to capture the case where a resize event is missed "after" the underlying surface is 
             // modified by Qt (Seen during level load in Editor)
-            case QEvent::ShowToParent: [[fallthrough]];
+            case QEvent::ShowToParent:  
 
             // Qt is sending this event as the final events after a viewport change. The resize signal is sent multiple
             // times per viewport (one for ShowToParent, one for Resize). The final resize will correctly set the
@@ -244,8 +243,7 @@ namespace AtomToolsFramework
             // after the UpdateLater event to force this.
             case QEvent::UpdateLater:   
             {
-                // Only try to resize the viewport once per 150ms. Calling start will reset the previous timer.
-                m_resizeEventCooldown.start(150);
+                SendWindowResizeEvent();
                 break;
             }
             case QEvent::PlatformSurface:
@@ -265,13 +263,12 @@ namespace AtomToolsFramework
     }
 
 
-    void RenderViewportWidget::enterEvent(QEvent* event)
+    void RenderViewportWidget::enterEvent(QEnterEvent* event)
     {
         if (const auto eventType = event->type();
             eventType == QEvent::Type::MouseMove)
         {
-            const auto* mouseEvent = static_cast<const QMouseEvent*>(event);
-            m_mousePosition = AzToolsFramework::ViewportInteraction::ScreenPointFromQPoint(mouseEvent->pos() * devicePixelRatioF());
+            m_mousePosition = AzToolsFramework::ViewportInteraction::ScreenPointFromQPoint(event->position().toPoint() * devicePixelRatioF());
         }
     }
 

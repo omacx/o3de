@@ -12,7 +12,6 @@
 
 #pragma once
 
-#if !defined(Q_MOC_RUN)
 #include <AzCore/Component/Entity.h>
 #include <AzCore/std/containers/vector.h>
 #include <AzCore/std/containers/unordered_map.h>
@@ -26,7 +25,6 @@
 #include <QTreeWidgetItem>
 
 #include <QWidget>
-#endif
 
 // forward declarations.
 class CTrackViewAnimNode;
@@ -80,7 +78,7 @@ public:
         CTrackViewNode* m_pNode;
     };
 
-    CTrackViewNodesCtrl(QWidget* hParentWnd, CTrackViewDialog* parent = 0);
+    CTrackViewNodesCtrl(QWidget* hParentWnd, CTrackViewDialog* parent = nullptr);
     ~CTrackViewNodesCtrl();
 
     void SetTrackViewDialog(CTrackViewDialog* dlg) { m_pTrackViewDialog = dlg; }
@@ -197,8 +195,8 @@ private:
     QCursor m_arrowCursor;
     QCursor m_noIcon;
 
-    UINT m_currentMatchIndex;
-    UINT m_matchCount;
+    unsigned int m_currentMatchIndex;
+    unsigned int m_matchCount;
 
     bool m_bIgnoreNotifications;
     bool m_bNeedReload;
@@ -219,8 +217,7 @@ private:
 };
 
 
-typedef CTrackViewNode* CTrackViewNodePtr;
-Q_DECLARE_METATYPE(CTrackViewNodePtr);
-QDataStream& operator<<(QDataStream& out, const CTrackViewNodePtr& obj);
-QDataStream& operator>>(QDataStream& in, CTrackViewNodePtr& obj);
+Q_DECLARE_METATYPE(CTrackViewNode*);
+QDataStream& operator<<(QDataStream& out, const CTrackViewNode*& obj);
+QDataStream& operator>>(QDataStream& in, CTrackViewNode*& obj);
 

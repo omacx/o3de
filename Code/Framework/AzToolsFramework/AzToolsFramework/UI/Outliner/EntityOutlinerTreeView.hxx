@@ -10,7 +10,6 @@
 
 #include <AzToolsFramework/AzToolsFrameworkAPI.h>
 
-#if !defined(Q_MOC_RUN)
 #include <AzCore/base.h>
 #include <AzCore/Memory/SystemAllocator.h>
 
@@ -19,9 +18,7 @@
 
 #include <AzToolsFramework/FocusMode/FocusModeNotificationBus.h>
 #include <AzQtComponents/Components/Widgets/TreeView.h>
-#endif
 
-#pragma once
 class QFocusEvent;
 class QMouseEvent;
 
@@ -45,7 +42,7 @@ namespace AzToolsFramework
     public:
         AZ_CLASS_ALLOCATOR(EntityOutlinerTreeView, AZ::SystemAllocator);
 
-        EntityOutlinerTreeView(QWidget* pParent = NULL);
+        EntityOutlinerTreeView(QWidget* pParent = nullptr);
         virtual ~EntityOutlinerTreeView();
 
         void setAutoExpandDelay(int delay);

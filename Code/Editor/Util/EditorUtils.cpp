@@ -143,7 +143,8 @@ QCursor CMFCUtils::LoadCursor(unsigned int nIDResource, int hotX, int hotY)
     if (!pm.isNull() && (hotX < 0 || hotY < 0))
     {
         QFile f(path);
-        f.open(QFile::ReadOnly);
+        [[maybe_unused]] const bool res = f.open(QFile::ReadOnly);
+        AZ_Assert(res, "Failed to open %s", qPrintable(path));
         QDataStream stream(&f);
         stream.setByteOrder(QDataStream::LittleEndian);
         f.read(10);
@@ -161,7 +162,7 @@ QString TrimTrailingZeros(QString str)
 {
     if (str.contains('.'))
     {
-        for (int p = str.size() - 1; p >= 0; --p)
+        for (int p = static_cast<int>(str.size()) - 1; p >= 0; --p)
         {
             if (str.at(p) == '.')
             {
@@ -191,12 +192,6 @@ AZ::Color ColorGammaToLinear(const QColor& col)
     return gammaColor.GammaToLinear();
 }
 
-QColor ColorToQColor(uint32 color)
-{
-    return QColor::fromRgbF((float)GetRValue(color) / 255.0f,
-        (float)GetGValue(color) / 255.0f,
-        (float)GetBValue(color) / 255.0f);
-}
 
 namespace EditorUtils
 {

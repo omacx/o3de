@@ -12,7 +12,7 @@
 ViewportFieldOfViewPropertyWidget::ViewportFieldOfViewPropertyWidget()
 {
     // Set label name.
-    m_label->setText("Field of View");
+    m_label->setText(tr("Field of View"));
 
     // Set suffix on SpinBox
     m_spinBox->setSuffix(" deg");
@@ -52,9 +52,10 @@ void ViewportFieldOfViewPropertyWidget::OnCameraFovChanged(float fovRadians)
 ViewportCameraSpeedScalePropertyWidget::ViewportCameraSpeedScalePropertyWidget()
 {
     // Set label name.
-    m_label->setText("Camera Speed Scale");
+    m_label->setText(tr("Camera Speed Scale"));
 
     // Set starting value.
+    m_spinBox->setMaximum(1.0e6f);
     m_spinBox->setValue(SandboxEditor::CameraSpeedScale());
 
     const int DefaultViewportId = 0;
@@ -82,7 +83,7 @@ void ViewportCameraSpeedScalePropertyWidget::OnCameraSpeedScaleChanged(float val
 ViewportGridSnappingSizePropertyWidget::ViewportGridSnappingSizePropertyWidget()
 {
     // Set label name.
-    m_label->setText("Grid Snapping Size");
+    m_label->setText(tr("Grid Snapping Size"));
 
     // Set suffix on SpinBox
     m_spinBox->setSuffix(" m");
@@ -99,7 +100,7 @@ void ViewportGridSnappingSizePropertyWidget::OnSpinBoxValueChanged(double newVal
 ViewportAngleSnappingSizePropertyWidget::ViewportAngleSnappingSizePropertyWidget()
 {
     // Set label name.
-    m_label->setText("Angle Snapping Size");
+    m_label->setText(tr("Angle Snapping Size"));
 
     // Set suffix on SpinBox
     m_spinBox->setSuffix(" deg");

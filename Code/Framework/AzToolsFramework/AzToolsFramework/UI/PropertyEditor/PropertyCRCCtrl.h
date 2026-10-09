@@ -10,13 +10,11 @@
 
 #include <AzToolsFramework/AzToolsFrameworkAPI.h>
 
-#if !defined(Q_MOC_RUN)
 #include <AzCore/Math/Crc.h>
 #include <AzCore/Memory/SystemAllocator.h>
 #include <QWidget>
 
 #include "PropertyEditorAPI.h"
-#endif
 
 class QLineEdit;
 class QString;
@@ -31,7 +29,7 @@ namespace AzToolsFramework
     public:
         AZ_CLASS_ALLOCATOR(PropertyCRCCtrl, AZ::SystemAllocator);
 
-        PropertyCRCCtrl(QWidget* pParent = NULL);
+        PropertyCRCCtrl(QWidget* pParent = nullptr);
         virtual ~PropertyCRCCtrl();
 
         AZ::u32 value() const;

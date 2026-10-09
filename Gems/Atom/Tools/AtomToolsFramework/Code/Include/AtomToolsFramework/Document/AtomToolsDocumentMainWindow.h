@@ -8,12 +8,10 @@
 
 #pragma once
 
-#if !defined(Q_MOC_RUN)
 #include <AtomToolsFramework/Document/AtomToolsDocumentNotificationBus.h>
 #include <AtomToolsFramework/Window/AtomToolsMainWindow.h>
 #include <AzCore/Memory/SystemAllocator.h>
 #include <AzQtComponents/Components/Widgets/TabWidget.h>
-#endif
 
 class QDragEnterEvent;
 class QDragLeaveEvent;
@@ -35,7 +33,7 @@ namespace AtomToolsFramework
 
         using Base = AtomToolsMainWindow;
 
-        AtomToolsDocumentMainWindow(const AZ::Crc32& toolId, const QString& objectName, QWidget* parent = 0);
+        AtomToolsDocumentMainWindow(const AZ::Crc32& toolId, const QString& objectName, QWidget* parent = nullptr);
         ~AtomToolsDocumentMainWindow();
 
         //! Helper function to get the absolute path for a document represented by the document ID
@@ -93,6 +91,8 @@ namespace AtomToolsFramework
 
         void AddDocumentTabBar();
         void UpdateRecentFileMenu();
+
+        void CommitInProgressEdit();
 
         // Return true when save success
         bool SaveDocument(const AZ::Uuid& documentId);

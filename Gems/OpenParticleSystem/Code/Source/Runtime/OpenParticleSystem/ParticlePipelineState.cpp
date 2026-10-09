@@ -16,22 +16,133 @@
 
 namespace OpenParticle
 {
-    void EmitterInstance::Setup(AZ::Data::Asset<AZ::RPI::MaterialAsset>& mat)
+    void EmitterInstance::Setup(AZ::Data::Asset<AZ::RPI::MaterialAsset>& mat, const MaterialPropertyOverrideMap& overrides)
     {
         m_materialAsset = mat;
+        m_materialOverrides = overrides;
+        // Preload the material asset so it's ready when Create() needs it.
+        // Without this, material sub-assets from the particle archive may not be
+        // loaded when the particle system activates on level load.
+        if (m_materialAsset.GetId().IsValid() && !m_materialAsset.IsReady())
+        {
+            m_materialAsset.QueueLoad();
+        }
         m_material = AZ::RPI::Material::Create(m_materialAsset);
+
+        if (!m_material)
+        {
+            AZ_Error("ParticleSystem", false,
+                "EmitterInstance::Setup - Material::Create() returned null. "
+                "The MaterialAsset or MaterialTypeAsset may not be fully loaded.");
+            m_needsPipelineRebuild = true;
+            m_needsMaterialOverrideApply = !m_materialOverrides.empty();
+            return;
+        }
+
+        // Overrides have to land before the pipeline is built: a property can drive a shader option or
+        // enable/disable a shader item, which changes which draw items ReBuildPipeline produces.
+        m_needsMaterialOverrideApply = !ApplyMaterialOverrides();
+
         ReBuildPipeline();
+
+        // If no shaders were built, mark for deferred rebuild
+        m_needsPipelineRebuild = m_shaders.empty();
+        if (m_needsPipelineRebuild)
+        {
+            AZ_Warning("ParticleSystem", false,
+                "EmitterInstance::Setup - no shaders built after ReBuildPipeline. "
+                "Pipeline will be rebuilt when shaders become available.");
+        }
+    }
+
+    bool EmitterInstance::ApplyMaterialOverrides()
+    {
+        if (!m_material)
+        {
+            return m_materialOverrides.empty();
+        }
+
+        if (!ApplyMaterialPropertyOverrides(m_material, m_materialOverrides))
+        {
+            return false;
+        }
+
+        // Keep the recorded change id in step so TryRebuildPipeline does not mistake our own property
+        // writes for an external material reload and rebuild the pipeline every frame.
+        m_materialChangeId = m_material->GetCurrentChangeId();
+        return true;
     }
 
     void EmitterInstance::Reset()
     {
         m_perDrawSrgs.clear();
         m_shaders.clear();
+        m_emitterForDrawPair.clear();
+    }
+
+    bool EmitterInstance::TryRebuildPipeline()
+    {
+        if (!m_needsPipelineRebuild && !m_needsMaterialOverrideApply)
+        {
+            return false;
+        }
+
+        if (!m_material)
+        {
+            // Material creation previously failed - try again
+            if (m_materialAsset && m_materialAsset->IsReady())
+            {
+                m_material = AZ::RPI::Material::Create(m_materialAsset);
+                if (!m_material)
+                {
+                    AZ_Warning("ParticleSystem", false,
+                        "TryRebuildPipeline - Material::Create() still returning null, will retry later");
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        // Retry any overrides that could not be compiled earlier. This must happen before the change id
+        // check below, since applying them is what moves the change id forward.
+        if (m_needsMaterialOverrideApply)
+        {
+            if (!ApplyMaterialOverrides())
+            {
+                return false;
+            }
+            m_needsMaterialOverrideApply = false;
+
+            // Overrides landed but the pipeline was already valid, so there is nothing left to rebuild.
+            if (!m_needsPipelineRebuild && !m_shaders.empty())
+            {
+                return true;
+            }
+        }
+
+        // Check if the material's change ID has changed (indicates shader reload or recompilation)
+        auto currentChangeId = m_material->GetCurrentChangeId();
+        if (currentChangeId == m_materialChangeId && !m_shaders.empty())
+        {
+            return false;
+        }
+
+        ReBuildPipeline();
+        m_needsPipelineRebuild = m_shaders.empty();
+        return !m_needsPipelineRebuild;
     }
 
     void EmitterInstance::ReBuildPipeline()
     {
         Reset();
+        if (!m_material)
+        {
+            return;
+        }
+
         auto& objectSrgLayout = m_material->GetAsset()->GetObjectSrgLayout();
         if (objectSrgLayout != nullptr)
         {
@@ -39,53 +150,63 @@ namespace OpenParticle
             m_objSrg = AZ::RPI::ShaderResourceGroup::Create(objSrgAsset, objectSrgLayout->GetName());
         }
 
-        auto& shaderCollection = m_material->GetGeneralShaderCollection();
-        for (auto& shaderItem : shaderCollection)
-        {
-            auto drawListTag = shaderItem.GetDrawListTagOverride();
-            if (drawListTag.IsNull())
+        m_material->ForAllShaderItems(
+            [this](const AZ::Name& materialPipelineName, const AZ::RPI::ShaderCollection::Item& shaderItem)
             {
-                auto shaderAsset = shaderItem.GetShaderAsset();
-                shaderAsset.QueueLoad();
-                if (shaderAsset.IsLoading())
+                if (!shaderItem.IsEnabled())
                 {
-                    shaderAsset.BlockUntilLoadComplete();
+                    return true;
                 }
-                drawListTag = AZ::RHI::RHISystemInterface::Get()->GetDrawListTagRegistry()->FindTag(shaderAsset->GetDrawListName());
-            }
-            if (!m_scene->HasOutputForPipelineState(drawListTag))
-            {
-                continue;
-            }
 
-            if (!shaderItem.IsEnabled())
-            {
-                continue;
-            }
+                auto drawListTag = shaderItem.GetDrawListTagOverride();
+                if (drawListTag.IsNull())
+                {
+                    auto shaderAsset = shaderItem.GetShaderAsset();
+                    if (!shaderAsset.IsReady())
+                    {
+                        shaderAsset.QueueLoad();
+                        shaderAsset.BlockUntilLoadComplete();
+                    }
+                    drawListTag = AZ::RHI::RHISystemInterface::Get()->GetDrawListTagRegistry()->FindTag(shaderAsset->GetDrawListName());
+                }
 
-            auto shader = AZ::RPI::Shader::FindOrCreate(shaderItem.GetShaderAsset());
-            if (!shader)
-            {
-                continue;
-            }
+                if (!m_scene->HasOutputForPipelineState(drawListTag))
+                {
+                    return true;
+                }
 
-            m_shaders.emplace_back(AZStd::pair{ drawListTag, shader });
-            auto drawSrgLayout = shader->GetAsset()->GetDrawSrgLayout();
-            if (drawSrgLayout)
-            {
-                auto drawSrg =
-                    AZ::RPI::ShaderResourceGroup::Create(shader->GetAsset(), shader->GetSupervariantIndex(), drawSrgLayout->GetName());
-                m_perDrawSrgs.emplace_back(drawSrg);
-                m_emitterForDrawPair.emplace(
-                    shader.get(),
-                    EmitterForDraw{ drawSrg.get(), { UINT64_MAX }, *shaderItem.GetRenderStatesOverlay(), shaderItem.GetShaderOptionGroup(), AZ::RHI::GeometryView(AZ::RHI::MultiDevice::AllDevices) });
-            }
-            else
-            {
-                m_emitterForDrawPair.emplace(shader.get(),
-                    EmitterForDraw{ nullptr, { UINT64_MAX }, *shaderItem.GetRenderStatesOverlay(), shaderItem.GetShaderOptionGroup(), AZ::RHI::GeometryView(AZ::RHI::MultiDevice::AllDevices) });
-            }
-        }
+                auto shader = AZ::RPI::Shader::FindOrCreate(shaderItem.GetShaderAsset());
+                if (!shader)
+                {
+                    return true;
+                }
+
+                EmitterDrawKey drawKey;
+                drawKey.m_shader = shader.get();
+                drawKey.m_drawListTag = drawListTag;
+                drawKey.m_materialPipelineName = materialPipelineName;
+                drawKey.m_shaderOptionHash = 0;
+
+                m_shaders.emplace_back(ShaderDrawRecord{ drawListTag, materialPipelineName, shader, drawKey });
+                auto drawSrgLayout = shader->GetAsset()->GetDrawSrgLayout();
+                if (drawSrgLayout)
+                {
+                    auto drawSrg =
+                        AZ::RPI::ShaderResourceGroup::Create(shader->GetAsset(), shader->GetSupervariantIndex(), drawSrgLayout->GetName());
+                    m_perDrawSrgs.emplace_back(drawSrg);
+                    m_emitterForDrawPair.emplace(
+                        drawKey,
+                        EmitterForDraw{ drawSrg.get(), { UINT64_MAX }, *shaderItem.GetRenderStatesOverlay(), shaderItem.GetShaderOptionGroup(), AZ::RHI::GeometryView(AZ::RHI::MultiDevice::AllDevices) });
+                }
+                else
+                {
+                    m_emitterForDrawPair.emplace(drawKey,
+                        EmitterForDraw{ nullptr, { UINT64_MAX }, *shaderItem.GetRenderStatesOverlay(), shaderItem.GetShaderOptionGroup(), AZ::RHI::GeometryView(AZ::RHI::MultiDevice::AllDevices) });
+                }
+
+                return true;
+            });
+
         m_materialChangeId = m_material->GetCurrentChangeId();
     }
 
@@ -137,12 +258,6 @@ namespace OpenParticle
         layoutBuilder.AddBuffer()->Channel("BITANGENT", AZ::RHI::Format::R32G32B32_FLOAT);
         layoutBuilder.AddBuffer()->Channel("UV", AZ::RHI::Format::R32G32_FLOAT);
         layoutBuilder.AddBuffer()->Channel("UV", AZ::RHI::Format::R32G32_FLOAT);
-        layoutBuilder.AddBuffer(AZ::RHI::StreamStepFunction::PerInstance)
-            ->Channel("OFFSET", AZ::RHI::Format::R32G32B32_FLOAT)
-            ->Channel("COLOR", AZ::RHI::Format::R32G32B32A32_FLOAT)
-            ->Channel("INITROTATION", AZ::RHI::Format::R32G32B32A32_FLOAT)
-            ->Channel("ROTATEVECTOR", AZ::RHI::Format::R32G32B32A32_FLOAT)
-            ->Channel("SCALE", AZ::RHI::Format::R32G32B32_FLOAT);
         m_streamLayout = layoutBuilder.End();
     }
 

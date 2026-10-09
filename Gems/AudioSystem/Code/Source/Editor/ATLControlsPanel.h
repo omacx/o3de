@@ -9,7 +9,6 @@
 
 #pragma once
 
-#if !defined(Q_MOC_RUN)
 #include <AudioControl.h>
 #include <AudioControlFilters.h>
 #include <IAudioInterfacesCommonData.h>
@@ -20,7 +19,6 @@
 #include <QLabel>
 
 #include <Source/Editor/ui_ATLControlsPanel.h>
-#endif
 
 // Forward declarations
 namespace Audio
@@ -136,7 +134,7 @@ namespace AudioControls
     {
         Q_OBJECT
     public:
-        QFilterButton(const QIcon& icon, const QString& text, QWidget* parent = 0);
+        QFilterButton(const QIcon& icon, const QString& text, QWidget* parent = nullptr);
 
         void SetText(const QString& text){ m_actionText.setText(text); }
 
@@ -147,7 +145,7 @@ namespace AudioControls
 
     protected:
         void mousePressEvent(QMouseEvent* event) override;
-        void enterEvent(QEvent* event) override;
+        void enterEvent(QEnterEvent* event) override;
         void leaveEvent(QEvent* event) override;
 
         QLabel m_checkIcon;

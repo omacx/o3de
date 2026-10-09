@@ -8,14 +8,12 @@
 
 #pragma once
 
-#if !defined(Q_MOC_RUN)
 #include <AtomToolsFramework/Document/AtomToolsDocumentInspector.h>
 #include <AtomToolsFramework/Document/AtomToolsDocumentMainWindow.h>
 #include <AtomToolsFramework/EntityPreviewViewport/EntityPreviewViewportSettingsInspector.h>
 #include <AtomToolsFramework/EntityPreviewViewport/EntityPreviewViewportToolBar.h>
 #include <AtomToolsFramework/EntityPreviewViewport/EntityPreviewViewportWidget.h>
 #include <AzCore/Component/ComponentApplicationBus.h>
-#endif
 
 namespace MaterialEditor
 {
@@ -31,7 +29,7 @@ namespace MaterialEditor
 
         using Base = AtomToolsFramework::AtomToolsDocumentMainWindow;
 
-        MaterialEditorMainWindow(const AZ::Crc32& toolId, QWidget* parent = 0);
+        MaterialEditorMainWindow(const AZ::Crc32& toolId, QWidget* parent = nullptr);
 
     protected:
         // AtomToolsFramework::AtomToolsMainWindowRequestBus::Handler overrides...

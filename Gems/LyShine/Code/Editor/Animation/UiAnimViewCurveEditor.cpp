@@ -19,10 +19,6 @@
 #include <Editor/Animation/ui_UiAnimViewCurveEditor.h>
 
 #include <QtUtil.h>
-#if defined(Q_OS_WIN)
-#include <QtWinExtras/QtWin>
-#endif
-
 
 #define IDC_TRACKVIEWGRAPH_CURVE 1
 #define IDC_TIMELINE             2
@@ -289,7 +285,7 @@ void CUiAnimViewCurveEditor::OnSplineChange()
 }
 
 //////////////////////////////////////////////////////////////////////////
-void CUiAnimViewCurveEditor::OnSplineCmd(UINT cmd)
+void CUiAnimViewCurveEditor::OnSplineCmd(unsigned int cmd)
 {
     m_ui->m_wndSpline->OnUserCommand(cmd);
     OnSplineCmdUpdateUI();

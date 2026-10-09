@@ -5,19 +5,17 @@
  * SPDX-License-Identifier: Apache-2.0 OR MIT
  *
  */
-#ifndef CONNECTION_H
-#define CONNECTION_H
 
-#if !defined(Q_MOC_RUN)
-#include <QThread>
-#include <QElapsedTimer>
+#pragma once
+
 #include "native/utilities/AssetUtilEBusHelper.h"
-#include <QHostAddress>
 
 #include <QTimer>
 #include <QString>
 #include <QPointer>
-#endif
+#include <QThread>
+#include <QElapsedTimer>
+#include <QHostAddress>
 
 class QSettings;
 
@@ -76,8 +74,8 @@ class Connection
     Q_PROPERTY(qint64 numOpenFiles MEMBER m_numOpenFiles NOTIFY NumOpenFilesChanged)
 
 public:
-    explicit Connection(qintptr socketDescriptor = -1, QObject* parent = 0);
-    explicit Connection(bool isUserCreatedConnection, qintptr socketDescriptor = -1, QObject* parent = 0);
+    explicit Connection(qintptr socketDescriptor = -1, QObject* parent = nullptr);
+    explicit Connection(bool isUserCreatedConnection, qintptr socketDescriptor = -1, QObject* parent = nullptr);
     virtual ~Connection();
 
     enum ConnectionStatus
@@ -298,6 +296,3 @@ private:
     qint64 m_numOpenFiles;
     Q_DISABLE_COPY(Connection)
 };
-
-
-#endif // CONNECTION_H

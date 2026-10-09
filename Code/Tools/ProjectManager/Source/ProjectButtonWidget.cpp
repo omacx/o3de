@@ -346,7 +346,7 @@ namespace O3DE::ProjectManager
         connect(m_projectImageLabel, &LabelButton::triggered, [this](QMouseEvent* event) {
             if (!m_isProjectBuilding && event->button() == Qt::RightButton)
             {
-                m_projectMenuButton->menu()->move(event->globalPos());
+                m_projectMenuButton->menu()->move(event->globalPosition().toPoint());
                 m_projectMenuButton->menu()->show();
             }
         });
@@ -382,7 +382,7 @@ namespace O3DE::ProjectManager
         {
             AZ::IO::FixedMaxPath editorExecutablePath = ProjectUtils::GetEditorExecutablePath(m_projectInfo.m_path.toUtf8().constData());
 
-            const QString shortcutName = QString("%1 Editor").arg(m_projectInfo.m_displayName); 
+            const QString shortcutName = QString(ProjectUtils::EditorShortcutFilenameFormat.data()).arg(m_projectInfo.m_displayName); 
             const QString arg = QString("--regset=\"/Amazon/AzCore/Bootstrap/project_path=%1\"").arg(m_projectInfo.m_path);
 
             auto result = ProjectUtils::CreateDesktopShortcut(shortcutName, editorExecutablePath.c_str(), { arg });
@@ -778,7 +778,7 @@ namespace O3DE::ProjectManager
         m_projectImageLabel->GetShowLogsButton()->hide();
     }
 
-    void ProjectButton::enterEvent(QEvent* /*event*/)
+    void ProjectButton::enterEvent(QEnterEvent* /*event*/)
     {
         if (m_canLaunch)
         {

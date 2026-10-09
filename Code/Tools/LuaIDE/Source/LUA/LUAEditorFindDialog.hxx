@@ -6,19 +6,16 @@
  *
  */
 
-#ifndef LUAEDITOR_FINDDIALOG_H
-#define LUAEDITOR_FINDDIALOG_H
+#pragma once
 
-#if !defined(Q_MOC_RUN)
 #include <AzCore/std/parallel/thread.h>
 #include <AzCore/std/parallel/semaphore.h>
 #include <AzCore/Component/Component.h>
+
 #include "LUAEditorView.hxx"
 
 #include <QDialog>
-#endif
 
-#pragma once
 
 class LUAEditorMainWindow;
 class QListWidget;
@@ -50,7 +47,7 @@ namespace LUAEditor
         Q_OBJECT
     public:
         AZ_CLASS_ALLOCATOR(LUAEditorFindDialog, AZ::SystemAllocator);
-        LUAEditorFindDialog(QWidget *parent = 0);
+        LUAEditorFindDialog(QWidget *parent = nullptr);
         ~LUAEditorFindDialog();
 
         void SetAnyDocumentsOpen(bool value);
@@ -188,5 +185,3 @@ namespace LUAEditor
     };
 
 }
-
-#endif //LUAEDITOR_FINDDIALOG_H

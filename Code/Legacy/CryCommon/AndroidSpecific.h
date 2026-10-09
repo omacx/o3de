@@ -6,13 +6,10 @@
  *
  */
 
+#pragma once
 
 // Description : Specific to Android declarations, inline functions etc.
 
-
-#ifndef CRYINCLUDE_CRYCOMMON_ANDROIDSPECIFIC_H
-#define CRYINCLUDE_CRYCOMMON_ANDROIDSPECIFIC_H
-#pragma once
 
 #if defined(__arm__) || defined(__aarch64__)
 #define _CPU_ARM
@@ -63,7 +60,7 @@ typedef uint64              DWORD_PTR;
 typedef DWORD               DWORD_PTR;
 #endif
 typedef intptr_t INT_PTR, *PINT_PTR;
-typedef uintptr_t UINT_PTR, * PUINT_PTR;
+typedef uintptr_t uintptr_t, * PUINT_PTR;
 typedef char* LPSTR, * PSTR;
 typedef uint64      __uint64;
 typedef int64       INT64;
@@ -75,7 +72,7 @@ typedef unsigned long ULONG_PTR, * PULONG_PTR;
 typedef unsigned char               BYTE;
 typedef unsigned short          WORD;
 typedef void*                               HWND;
-typedef UINT_PTR                        WPARAM;
+typedef uintptr_t                        WPARAM;
 typedef LONG_PTR                        LPARAM;
 typedef LONG_PTR                        LRESULT;
 #define PLARGE_INTEGER LARGE_INTEGER *
@@ -119,8 +116,6 @@ extern int wcsnicmp (const wchar_t* s1, const wchar_t* s2, size_t count);
 #undef wcsnlen
 extern size_t wcsnlen(const wchar_t* str, size_t maxLen);
 
-#undef stpcpy
-extern char* stpcpy(char* dest, const char* str);
 // end android-19
 
 
@@ -170,7 +165,7 @@ extern char* stpcpy(char* dest, const char* str);
 // std::stoull deosn't exist on android, so we need to define it
 namespace std
 {
-    inline unsigned long long stoull(const std::string& str, size_t* idx = 0, int base = 10)
+    inline unsigned long long stoull(const std::string& str, size_t* idx = nullptr, int base = 10)
     {
         const char* start = str.c_str();
         char* end = nullptr;
@@ -182,5 +177,3 @@ namespace std
         return result;
     }
 }
-
-#endif // CRYINCLUDE_CRYCOMMON_ANDROIDSPECIFIC_H

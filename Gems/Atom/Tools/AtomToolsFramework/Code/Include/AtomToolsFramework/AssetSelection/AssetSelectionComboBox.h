@@ -8,11 +8,10 @@
 
 #pragma once
 
-#if !defined(Q_MOC_RUN)
 #include <AzFramework/Asset/AssetCatalogBus.h>
 #include <AzToolsFramework/Thumbnails/Thumbnail.h>
+
 #include <QComboBox>
-#endif
 
 namespace AtomToolsFramework
 {
@@ -24,7 +23,7 @@ namespace AtomToolsFramework
     public:
         using FilterFn = AZStd::function<bool(const AZStd::string&)>;
 
-        AssetSelectionComboBox(const FilterFn& filterFn, QWidget* parent = 0);
+        AssetSelectionComboBox(const FilterFn& filterFn, QWidget* parent = nullptr);
         ~AssetSelectionComboBox();
 
         void Clear();

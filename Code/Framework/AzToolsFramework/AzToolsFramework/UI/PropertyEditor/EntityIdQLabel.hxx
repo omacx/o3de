@@ -10,14 +10,12 @@
 #include <AzToolsFramework/AzToolsFrameworkAPI.h>
 
 
-#if !defined(Q_MOC_RUN)
 #include <AzCore/base.h>
 #include <AzCore/Component/ComponentBus.h>
 #include <AzCore/Memory/SystemAllocator.h>
 #include <AzCore/std/string/string_view.h>
 
 #include <QLabel>
-#endif
 
 
 class QSpinBox;
@@ -32,7 +30,7 @@ namespace AzToolsFramework
     public:
         AZ_CLASS_ALLOCATOR(EntityIdQLabel, AZ::SystemAllocator);
 
-        explicit EntityIdQLabel(QWidget* parent = 0);
+        explicit EntityIdQLabel(QWidget* parent = nullptr);
         ~EntityIdQLabel() override;
 
         void SetEntityId(AZ::EntityId newId, const AZStd::string_view& nameOverride);

@@ -8,7 +8,6 @@
 
 #pragma once
 
-#if !defined(Q_MOC_RUN)
 #include <AtomToolsFramework/Graph/GraphViewSettings.h>
 #include <AtomToolsFramework/Window/AtomToolsMainWindowRequestBus.h>
 #include <AzCore/Component/EntityId.h>
@@ -24,7 +23,6 @@
 
 #include <QToolButton>
 #include <QWidget>
-#endif
 
 namespace GraphCanvas
 {
@@ -65,7 +63,7 @@ namespace AtomToolsFramework
             const AZ::Crc32& toolId,
             const GraphCanvas::GraphId& activeGraphId,
             GraphViewSettingsPtr graphViewSettingsPtr,
-            QWidget* parent = 0);
+            QWidget* parent = nullptr);
         ~GraphView();
 
         // Assign the graph ID that will be rendered and edited within the view. Any connected buses will be disconnected from the old ID

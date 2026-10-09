@@ -33,7 +33,6 @@ ly_add_target(
             AZ::AzFramework
             Legacy::CryCommon
         PUBLIC
-            AZ::AtomCore
             Gem::Atom_RPI.Public
             Gem::CommonFeaturesAtom.Static
             Gem::LmbrCentral
@@ -106,7 +105,7 @@ if (PAL_TRAIT_BUILD_HOST_TOOLS)
         BUILD_DEPENDENCIES
             PUBLIC
                 ${gem_name}StaticLib
-                3rdParty::Qt::OpenGL
+                3rdParty::Qt::OpenGLWidgets
                 3rdParty::Qt::Widgets
                 AZ::AssetBuilderSDK
                 AZ::AzQtComponents

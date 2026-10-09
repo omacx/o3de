@@ -31,7 +31,7 @@
 size_t CSimpleStringPool::g_nTotalAllocInXmlStringPools = 0;
 
 //////////////////////////////////////////////////////////////////////////
-static int __cdecl ascii_stricmp(const char* dst, const char* src)
+static int AZ_CDECL ascii_stricmp(const char* dst, const char* src)
 {
     int f, l;
     do
@@ -116,12 +116,12 @@ CXmlNode::~CXmlNode()
 }
 
 CXmlNode::CXmlNode()
-    : m_pStringPool(NULL) // must be changed later.
+    : m_pStringPool(nullptr) // must be changed later.
     , m_tag("")
     , m_content("")
-    , m_parent(NULL)
-    , m_pChilds(NULL)
-    , m_pAttributes(NULL)
+    , m_parent(nullptr)
+    , m_pChilds(nullptr)
+    , m_pAttributes(nullptr)
     , m_line(0)
     , m_isProcessingInstruction(false)
 {
@@ -130,9 +130,9 @@ CXmlNode::CXmlNode()
 
 CXmlNode::CXmlNode(const char* tag, bool bReuseStrings, bool bIsProcessingInstruction)
     : m_content("")
-    , m_parent(NULL)
-    , m_pChilds(NULL)
-    , m_pAttributes(NULL)
+    , m_parent(nullptr)
+    , m_pChilds(nullptr)
+    , m_pAttributes(nullptr)
     , m_line(0)
     , m_isProcessingInstruction(bIsProcessingInstruction)
 {
@@ -257,23 +257,21 @@ void CXmlNode::setAttr(const char* key, const char* value)
 
 void CXmlNode::setAttr(const char* key, int value)
 {
-    char str[128];
-    azitoa(value, str, AZ_ARRAY_SIZE(str), 10);
-    setAttr(key, str);
+    AZStd::string str = AZStd::to_string(value);
+    setAttr(key, str.c_str());
 }
 
 void CXmlNode::setAttr(const char* key, unsigned int value)
 {
-    char str[128];
-    azui64toa(value, str, AZ_ARRAY_SIZE(str), 10);
-    setAttr(key, str);
+    AZStd::string uintStr = AZStd::to_string(value);
+    setAttr(key, uintStr.c_str());
 }
 
 void CXmlNode::setAttr(const char* key, float value)
 {
     char str[128];
     AZ::Locale::ScopedSerializationLocale localeResetter;
-    sprintf_s(str, FLOAT_FMT, value);
+    azsprintf(str, FLOAT_FMT, value);
     setAttr(key, str);
 }
 
@@ -281,7 +279,7 @@ void CXmlNode::setAttr(const char* key, double value)
 {
     char str[128];
     AZ::Locale::ScopedSerializationLocale localeResetter;
-    sprintf_s(str, DOUBLE_FMT, value);
+    azsprintf(str, DOUBLE_FMT, value);
     setAttr(key, str);
 }
 
@@ -289,7 +287,7 @@ void CXmlNode::setAttr(const char* key, double value)
 void CXmlNode::setAttr(const char* key, int64 value)
 {
     char str[32];
-    sprintf_s(str, "%" PRId64, value);
+    azsprintf(str, "%" PRId64, aznumeric_cast<int64_t>(value));
     setAttr(key, str);
 }
 
@@ -299,11 +297,11 @@ void CXmlNode::setAttr(const char* key, uint64 value, bool useHexFormat)
     char str[32] = { 0 };
     if (useHexFormat)
     {
-        sprintf_s(str, "%" PRIX64, value);
+        azsprintf(str, "%" PRIX64, aznumeric_cast<uint64_t>(value));
     }
     else
     {
-        sprintf_s(str, "%" PRIu64, value);
+        azsprintf(str, "%" PRIu64, aznumeric_cast<uint64_t>(value));
     }
     setAttr(key, str);
 }
@@ -312,21 +310,21 @@ void CXmlNode::setAttr(const char* key, const Ang3& value)
 {
     char str[128];
     AZ::Locale::ScopedSerializationLocale localeResetter;
-    sprintf_s(str, FLOAT_FMT "," FLOAT_FMT "," FLOAT_FMT, value.x, value.y, value.z);
+    azsprintf(str, FLOAT_FMT "," FLOAT_FMT "," FLOAT_FMT, value.x, value.y, value.z);
     setAttr(key, str);
 }
 void CXmlNode::setAttr(const char* key, const Vec3& value)
 {
     char str[128];
     AZ::Locale::ScopedSerializationLocale localeResetter;
-    sprintf_s(str, FLOAT_FMT "," FLOAT_FMT "," FLOAT_FMT, value.x, value.y, value.z);
+    azsprintf(str, FLOAT_FMT "," FLOAT_FMT "," FLOAT_FMT, value.x, value.y, value.z);
     setAttr(key, str);
 }
 void CXmlNode::setAttr(const char* key, const Vec4& value)
 {
     char str[128];
     AZ::Locale::ScopedSerializationLocale localeResetter;
-    sprintf_s(str, FLOAT_FMT "," FLOAT_FMT "," FLOAT_FMT "," FLOAT_FMT, value.x, value.y, value.z, value.w);
+    azsprintf(str, FLOAT_FMT "," FLOAT_FMT "," FLOAT_FMT "," FLOAT_FMT, value.x, value.y, value.z, value.w);
     setAttr(key, str);
 }
 
@@ -334,7 +332,7 @@ void CXmlNode::setAttr(const char* key, const Vec2& value)
 {
     char str[128];
     AZ::Locale::ScopedSerializationLocale localeResetter;
-    sprintf_s(str, FLOAT_FMT "," FLOAT_FMT, value.x, value.y);
+    azsprintf(str, FLOAT_FMT "," FLOAT_FMT, value.x, value.y);
     setAttr(key, str);
 }
 
@@ -342,7 +340,7 @@ void CXmlNode::setAttr(const char* key, const AZ::Quaternion& value)
 {
     char str[128];
     AZ::Locale::ScopedSerializationLocale localeResetter;
-    sprintf_s(str, FLOAT_FMT "," FLOAT_FMT "," FLOAT_FMT "," FLOAT_FMT, value.GetW(), value.GetX(), value.GetY(), value.GetZ());
+    azsprintf(str, FLOAT_FMT "," FLOAT_FMT "," FLOAT_FMT "," FLOAT_FMT, value.GetW(), value.GetX(), value.GetY(), value.GetZ());
     setAttr(key, str);
 }
 
@@ -363,7 +361,7 @@ bool CXmlNode::getAttr(const char* key, unsigned int& value) const
     const char* svalue = GetValue(key);
     if (svalue)
     {
-        value = static_cast<unsigned int>(strtoul(svalue, NULL, 10));
+        value = static_cast<unsigned int>(strtoul(svalue, nullptr, 10));
         return true;
     }
     return false;
@@ -563,7 +561,7 @@ XmlNodeRef CXmlNode::findChild(const char* tag) const
             }
         }
     }
-    return 0;
+    return nullptr;
 }
 
 void CXmlNode::removeChild(const XmlNodeRef& node)
@@ -610,7 +608,7 @@ void CXmlNode::addChild(const XmlNodeRef& node)
         m_pChilds = new XmlNodes;
     }
 
-    assert(node != 0);
+    assert(node != nullptr);
     IXmlNode* pNode = ((IXmlNode*)node);
     pNode->AddRef();
     m_pChilds->push_back(pNode);
@@ -797,7 +795,7 @@ void CXmlNode::ReleaseChild(IXmlNode* pChild)
     {
         if (pChild->getParent() == this)      // if check to handle shared children which are supported by the CXmlNode impl
         {
-            pChild->setParent(NULL);
+            pChild->setParent(nullptr);
         }
         pChild->Release();
     }
@@ -939,123 +937,6 @@ void CXmlNode::AddToXmlString(XmlString& xml, int level, AZ::IO::HandleType file
     xml += "</";
     xml += m_tag;
     xml += ">\n";
-}
-
-#if !defined(APPLE) && !defined(LINUX) && !defined(AZ_LEGACY_CRYSYSTEM_TRAIT_HASSTPCPY)
-ILINE static char* stpcpy(char* dst, const char* src)
-{
-    while (src[0])
-    {
-        dst[0] = src[0];
-        dst++;
-        src++;
-    }
-    return dst;
-}
-#endif
-
-char* CXmlNode::AddToXmlStringUnsafe(char* xml, int level, char* endPtr, AZ::IO::HandleType fileHandle, size_t chunkSize) const
-{
-    const bool bHasChildren = (m_pChilds && !m_pChilds->empty());
-
-    for (int i = 0; i < level; i++)
-    {
-        *(xml++) = ' ';
-        *(xml++) = ' ';
-    }
-
-    // Begin Tag
-    if (!m_pAttributes || m_pAttributes->empty())
-    {
-        *(xml++) = '<';
-        xml = stpcpy(xml, m_tag);
-        if (*m_content == 0 && !bHasChildren)
-        {
-            *(xml++) = '/';
-            *(xml++) = '>';
-            *(xml++) = '\n';
-            return xml;
-        }
-        *(xml++) = '>';
-    }
-    else
-    {
-        *(xml++) = '<';
-        xml = stpcpy(xml, m_tag);
-        *(xml++) = ' ';
-
-        // Put attributes.
-        for (XmlAttributes::const_iterator it = m_pAttributes->begin(); it != m_pAttributes->end(); )
-        {
-            xml = stpcpy(xml, it->key);
-            *(xml++) = '=';
-            *(xml++) = '\"';
-#ifndef _RELEASE
-            if (it->value[strcspn(it->value, "\"\'&><")])
-            {
-                __debugbreak();
-            }
-#endif
-            xml = stpcpy(xml, it->value);
-            ++it;
-            *(xml++) = '\"';
-            if (it != m_pAttributes->end())
-            {
-                *(xml++) = ' ';
-            }
-        }
-        if (*m_content == 0 && !bHasChildren)
-        {
-            // Compact tag form.
-            *(xml++) = '/';
-            *(xml++) = '>';
-            *(xml++) = '\n';
-            return xml;
-        }
-        *(xml++) = '>';
-    }
-
-#ifndef _RELEASE
-    if (m_content[strcspn(m_content, "\"\'&><")])
-    {
-        __debugbreak();
-    }
-#endif
-    xml = stpcpy(xml, m_content);
-
-    if (!bHasChildren)
-    {
-        *(xml++) = '<';
-        *(xml++) = '/';
-        xml = stpcpy(xml, m_tag);
-        *(xml++) = '>';
-        *(xml++) = '\n';
-        return xml;
-    }
-
-    *(xml++) = '\n';
-
-    // Add sub nodes.
-    for (XmlNodes::iterator it = m_pChilds->begin(), itEnd = m_pChilds->end(); it != itEnd; ++it)
-    {
-        IXmlNode* node = *it;
-        xml = ((CXmlNode*)node)->AddToXmlStringUnsafe(xml, level + 1, endPtr, fileHandle, chunkSize);
-    }
-
-    for (int i = 0; i < level; i++)
-    {
-        *(xml++) = ' ';
-        *(xml++) = ' ';
-    }
-    *(xml++) = '<';
-    *(xml++) = '/';
-    xml = stpcpy(xml, m_tag);
-    *(xml++) = '>';
-    *(xml++) = '\n';
-
-    assert(xml < endPtr);
-
-    return xml;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1210,7 +1091,7 @@ void XmlParserImp::CleanStack()
     m_nNodeStackTop = 0;
     for (int i = 0, num = static_cast<int>(m_nodeStack.size()); i < num; i++)
     {
-        m_nodeStack[i].node = 0;
+        m_nodeStack[i].node = nullptr;
         m_nodeStack[i].childs.resize(0);
     }
 }
@@ -1253,7 +1134,7 @@ void    XmlParserImp::onStartElement(const char* tagName, const char** atts)
     // Call start element callback.
     int i = 0;
     int numAttrs = 0;
-    while (atts[i] != 0)
+    while (atts[i] != nullptr)
     {
         numAttrs++;
         i += 2;
@@ -1269,7 +1150,7 @@ void    XmlParserImp::onStartElement(const char* tagName, const char** atts)
         XmlAttributes& nodeAtts = *(pCNode->m_pAttributes);
         nodeAtts.resize(numAttrs);
         int nAttr = 0;
-        while (atts[i] != 0)
+        while (atts[i] != nullptr)
         {
             nodeAtts[nAttr].key = AddString(atts[i]);
             nodeAtts[nAttr].value = AddString(atts[i + 1]);
@@ -1299,7 +1180,7 @@ void    XmlParserImp::onEndElement([[maybe_unused]] const char* tagName)
             *currNode->m_pChilds = entry.childs;
         }
         entry.childs.resize(0);
-        entry.node = NULL;
+        entry.node = nullptr;
     }
     m_nNodeStackTop--;
 }
@@ -1331,7 +1212,7 @@ void    XmlParserImp::onRawData(const char* data)
 //////////////////////////////////////////////////////////////////////////
 XmlParserImp::XmlParserImp(bool bReuseStrings)
     : m_nNodeStackTop(0)
-    , m_parser(NULL)
+    , m_parser(nullptr)
     , m_stringPool(bReuseStrings)
 {
     m_nodeStack.resize(32);
@@ -1362,7 +1243,7 @@ namespace
 //////////////////////////////////////////////////////////////////////////
 void XmlParserImp::ParseBegin(bool bCleanPools)
 {
-    m_root = 0;
+    m_root = nullptr;
     CleanStack();
 
     if (bCleanPools)
@@ -1375,7 +1256,7 @@ void XmlParserImp::ParseBegin(bool bCleanPools)
     memHandler.realloc_fcn = custom_xml_realloc;
     memHandler.free_fcn = custom_xml_free;
 
-    m_parser = XML_ParserCreate_MM(NULL, &memHandler, NULL);
+    m_parser = XML_ParserCreate_MM(nullptr, &memHandler, nullptr);
 
     XML_SetUserData(m_parser, this);
     XML_SetElementHandler(m_parser, startElement, endElement);
@@ -1390,7 +1271,7 @@ void XmlParserImp::ParseEnd()
     {
         XML_ParserFree(m_parser);
     }
-    m_parser = 0;
+    m_parser = nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1398,7 +1279,7 @@ XmlNodeRef XmlParserImp::ParseBuffer(const char* buffer, size_t bufLen, XmlStrin
 {
     static const char* const errorPrefix = "XML parser: ";
 
-    XmlNodeRef root = 0;
+    XmlNodeRef root = nullptr;
 
     // Let's try to parse the buffer as binary XML
     {
@@ -1417,7 +1298,7 @@ XmlNodeRef XmlParserImp::ParseBuffer(const char* buffer, size_t bufLen, XmlStrin
             {
                 CryWarning(VALIDATOR_MODULE_SYSTEM, VALIDATOR_WARNING, "%s%s (data size: %u)", errorPrefix, str, static_cast<unsigned>(bufLen));
             }
-            return 0;
+            return nullptr;
         }
     }
 
@@ -1433,7 +1314,7 @@ XmlNodeRef XmlParserImp::ParseBuffer(const char* buffer, size_t bufLen, XmlStrin
         else
         {
             char str[1024];
-            sprintf_s(str, "%s%s at line %d", errorPrefix, XML_ErrorString(XML_GetErrorCode(m_parser)), (int)XML_GetCurrentLineNumber(m_parser));
+            azsprintf(str, "%s%s at line %d", errorPrefix, XML_ErrorString(XML_GetErrorCode(m_parser)), (int)XML_GetCurrentLineNumber(m_parser));
             errorString = str;
             if (!bSuppressWarnings)
             {
@@ -1441,7 +1322,7 @@ XmlNodeRef XmlParserImp::ParseBuffer(const char* buffer, size_t bufLen, XmlStrin
             }
         }
 
-        m_root = 0;
+        m_root = nullptr;
         ParseEnd();
     }
 
@@ -1453,14 +1334,14 @@ XmlNodeRef XmlParserImp::ParseFile(const char* filename, XmlString& errorString,
 {
     if (!filename)
     {
-        return 0;
+        return nullptr;
     }
 
     static const char* const errorPrefix = "XML reader: ";
 
-    XmlNodeRef root = 0;
+    XmlNodeRef root = nullptr;
 
-    char* pFileContents = 0;
+    char* pFileContents = nullptr;
     size_t fileSize = 0;
 
     char str[1024];
@@ -1473,37 +1354,37 @@ XmlNodeRef XmlParserImp::ParseFile(const char* filename, XmlString& errorString,
 
         if (!xmlFile.Open(filename, "rb"))
         {
-            sprintf_s(str, "%sCan't open file (%s)", errorPrefix, filename);
+            azsprintf(str, "%sCan't open file (%s)", errorPrefix, filename);
             errorString = str;
             CryWarning(VALIDATOR_MODULE_SYSTEM, VALIDATOR_WARNING, "%s", str);
-            return 0;
+            return nullptr;
         }
 
         fileSize = xmlFile.GetLength();
         if (fileSize <= 0)
         {
-            sprintf_s(str, "%sFile is empty (%s)", errorPrefix, filename);
+            azsprintf(str, "%sFile is empty (%s)", errorPrefix, filename);
             errorString = str;
             CryWarning(VALIDATOR_MODULE_SYSTEM, VALIDATOR_WARNING, "%s", str);
-            return 0;
+            return nullptr;
         }
 
         pFileContents = new char[fileSize];
         if (!pFileContents)
         {
-            sprintf_s(str, "%sCan't allocate %u bytes of memory (%s)", errorPrefix, static_cast<unsigned>(fileSize), filename);
+            azsprintf(str, "%sCan't allocate %u bytes of memory (%s)", errorPrefix, static_cast<unsigned>(fileSize), filename);
             errorString = str;
             CryWarning(VALIDATOR_MODULE_SYSTEM, VALIDATOR_WARNING, "%s", str);
-            return 0;
+            return nullptr;
         }
 
         if (xmlFile.ReadRaw(pFileContents, fileSize) != fileSize)
         {
             delete [] pFileContents;
-            sprintf_s(str, "%sCan't read file (%s)", errorPrefix, filename);
+            azsprintf(str, "%sCan't read file (%s)", errorPrefix, filename);
             errorString = str;
             CryWarning(VALIDATOR_MODULE_SYSTEM, VALIDATOR_WARNING, "%s", str);
-            return 0;
+            return nullptr;
         }
 
         AZ::IO::FixedMaxPath resolvedPath(AZ::IO::PosixPathSeparator);
@@ -1529,10 +1410,10 @@ XmlNodeRef XmlParserImp::ParseFile(const char* filename, XmlString& errorString,
     if (result != XMLBinary::XMLBinaryReader::eResult_NotBinXml)
     {
         delete [] pFileContents;
-        sprintf_s(str, "%s%s (%s)", errorPrefix, reader.GetErrorDescription(), filename);
+        azsprintf(str, "%s%s (%s)", errorPrefix, reader.GetErrorDescription(), filename);
         errorString = str;
         CryWarning(VALIDATOR_MODULE_SYSTEM, VALIDATOR_WARNING, "%s", str);
-        return 0;
+        return nullptr;
     }
     else
     {
@@ -1541,9 +1422,9 @@ XmlNodeRef XmlParserImp::ParseFile(const char* filename, XmlString& errorString,
         constexpr AZStd::fixed_string<32> strScripts{"Scripts/"};
         // exclude files and PAKs from Mods folder
         constexpr AZStd::fixed_string<8> modsStr{"Mods/"};
-        if (_strnicmp(filename, strScripts.c_str(), strScripts.length()) == 0 &&
-            _strnicmp(adjustedFilename.c_str(), modsStr.c_str(), modsStr.length()) != 0 &&
-            _strnicmp(pakPath.c_str(), modsStr.c_str(), modsStr.length()) != 0)
+        if (azstrnicmp(filename, strScripts.c_str(), strScripts.length()) == 0 &&
+            azstrnicmp(adjustedFilename.c_str(), modsStr.c_str(), modsStr.length()) != 0 &&
+            azstrnicmp(pakPath.c_str(), modsStr.c_str(), modsStr.length()) != 0)
         {
 #ifdef _RELEASE
                 CryWarning(VALIDATOR_MODULE_SYSTEM, VALIDATOR_WARNING, "Non binary XML found in scripts dir (%s)", filename);
@@ -1561,12 +1442,12 @@ XmlNodeRef XmlParserImp::ParseFile(const char* filename, XmlString& errorString,
         }
         else
         {
-            sprintf_s(str, "%s%s at line %d (%s)", errorPrefix, XML_ErrorString(XML_GetErrorCode(m_parser)), (int)XML_GetCurrentLineNumber(m_parser), filename);
+            azsprintf(str, "%s%s at line %d (%s)", errorPrefix, XML_ErrorString(XML_GetErrorCode(m_parser)), (int)XML_GetCurrentLineNumber(m_parser), filename);
             errorString = str;
             CryWarning(VALIDATOR_MODULE_SYSTEM, VALIDATOR_WARNING, "%s", str);
         }
 
-        m_root = 0;
+        m_root = nullptr;
         ParseEnd();
     }
 
@@ -1629,7 +1510,7 @@ void CXmlNodeReuse::Release()
 CXmlNodePool::CXmlNodePool(unsigned int nBlockSize, bool bReuseStrings)
 {
     m_pStringPool = new CXmlStringPool(bReuseStrings);
-    assert(m_pStringPool != 0);
+    assert(m_pStringPool != nullptr);
 
     // in order to avoid memory fragmentation
     // allocates 1Mb buffer for shared string pool
@@ -1651,7 +1532,7 @@ CXmlNodePool::~CXmlNodePool()
 
 XmlNodeRef CXmlNodePool::GetXmlNode(const char* sNodeName)
 {
-    CXmlNodeReuse* pNode = 0;
+    CXmlNodeReuse* pNode = nullptr;
 
     // NOTE: at the moment xml node pool is dedicated for statistics nodes only
 
@@ -1673,7 +1554,7 @@ XmlNodeRef CXmlNodePool::GetXmlNode(const char* sNodeName)
         // there is no free nodes so create new one
         // later it will be reused as soon as no external references left
         pNode = new CXmlNodeReuse(sNodeName, this);
-        assert(pNode != 0);
+        assert(pNode != nullptr);
 
         // increase ref counter for reusing node later
         pNode->AddRef();

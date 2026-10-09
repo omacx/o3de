@@ -9,15 +9,14 @@
 
 #pragma once
 
-#if !defined(Q_MOC_RUN)
 #include "UiAnimViewNode.h"
 #include "UiAnimViewSequence.h"
 #include "Undo/IUndoManagerListener.h"
 
 #include <LyShine/Animation/IUiAnimation.h>
+
 #include <QMap>
 #include <QTreeWidgetItem>
-#endif
 
 // forward declarations.
 class CUiAnimViewNode;
@@ -69,7 +68,7 @@ public:
         CUiAnimViewNode* m_pNode;
     };
 
-    CUiAnimViewNodesCtrl(QWidget* hParentWnd, CUiAnimViewDialog* parent = 0);
+    CUiAnimViewNodesCtrl(QWidget* hParentWnd, CUiAnimViewDialog* parent = nullptr);
     ~CUiAnimViewNodesCtrl();
 
     void SetUiAnimViewDialog(CUiAnimViewDialog* dlg) { m_pUiAnimViewDialog = dlg; }
@@ -170,8 +169,8 @@ private:
     QCursor m_arrowCursor;
     QCursor m_noIcon;
 
-    UINT m_currentMatchIndex;
-    UINT m_matchCount;
+    unsigned int m_currentMatchIndex;
+    unsigned int m_matchCount;
 
     bool m_bIgnoreNotifications;
     bool m_bNeedReload;
@@ -185,8 +184,6 @@ private:
     QScopedPointer<Ui::CUiAnimViewNodesCtrl> ui;
 };
 
-
-typedef CUiAnimViewNode* CUiAnimViewNodePtr;
-Q_DECLARE_METATYPE(CUiAnimViewNodePtr);
-QDataStream& operator<<(QDataStream& out, const CUiAnimViewNodePtr& obj);
-QDataStream& operator>>(QDataStream& in, CUiAnimViewNodePtr& obj);
+Q_DECLARE_METATYPE(CUiAnimViewNode*);
+QDataStream& operator<<(QDataStream& out, const CUiAnimViewNode*& obj);
+QDataStream& operator>>(QDataStream& in, CUiAnimViewNode*& obj);

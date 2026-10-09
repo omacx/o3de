@@ -6,10 +6,8 @@
  *
  */
 
-#ifndef LUAEDITORVIEW_H
-#define LUAEDITORVIEW_H
+#pragma once
 
-#if !defined(Q_MOC_RUN)
 #include <AzCore/base.h>
 #include <AzCore/Memory/SystemAllocator.h>
 #include <AzCore/std/smart_ptr/unique_ptr.h>
@@ -18,9 +16,7 @@
 
 #include "LUAEditorContextInterface.h"
 #include "LUABreakpointTrackerMessages.h"
-#endif
 
-#pragma once
 
 class QWidget;
 class QFocusEvent;
@@ -64,7 +60,7 @@ namespace LUAEditor
     public:
         AZ_CLASS_ALLOCATOR(LUAViewWidget, AZ::SystemAllocator);
 
-        LUAViewWidget(QWidget *pParent = NULL);
+        LUAViewWidget(QWidget *pParent = nullptr);
         virtual ~LUAViewWidget();
 
         DocumentInfo m_Info; // last updated doc info - we will get updates to this.
@@ -230,5 +226,3 @@ namespace LUAEditor
     };
 
 };
-
-#endif //LUAEDITORVIEW_H

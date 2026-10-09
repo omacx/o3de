@@ -144,7 +144,7 @@ static inline void InlineInitializationProcessing([[maybe_unused]] const char* s
 {
     if (gEnv->pLog)
     {
-        gEnv->pLog->UpdateLoadingScreen(0);
+        gEnv->pLog->UpdateLoadingScreen(nullptr);
     }
 }
 
@@ -163,7 +163,7 @@ static void CmdCrashTest(IConsoleCmdArgs* pArgs)
         {
         case 1:
             {
-                int* p = 0;
+                int* p = nullptr;
                 *p = 0xABCD;
             }
             break;
@@ -370,7 +370,7 @@ bool CSystem::InitAudioSystem()
 void CSystem::InitLocalization()
 {
     // Set the localization folder
-    ICVar* pCVar = m_env.pConsole != 0 ? m_env.pConsole->GetCVar("sys_localization_folder") : 0;
+    ICVar* pCVar = m_env.pConsole != nullptr ? m_env.pConsole->GetCVar("sys_localization_folder") : nullptr;
     if (pCVar)
     {
         static_cast<AZ::IO::Archive* const>(m_env.pCryPak)->SetLocalizationFolder(g_cvars.sys_localization_folder->GetString());
@@ -443,8 +443,8 @@ void CSystem::OpenPlatformPaks()
     const char* const assetsDir = "@products@";
     // Load Android Obb files if available
     const char* obbStorage = AZ::Android::Utils::GetObbStoragePath();
-    AZStd::string mainObbPath = AZStd::move(AZStd::string::format("%s/%s", obbStorage, AZ::Android::Utils::GetObbFileName(true)));
-    AZStd::string patchObbPath = AZStd::move(AZStd::string::format("%s/%s", obbStorage, AZ::Android::Utils::GetObbFileName(false)));
+    AZStd::string mainObbPath = AZStd::string::format("%s/%s", obbStorage, AZ::Android::Utils::GetObbFileName(true));
+    AZStd::string patchObbPath = AZStd::string::format("%s/%s", obbStorage, AZ::Android::Utils::GetObbFileName(false));
     m_env.pCryPak->OpenPack(assetsDir, mainObbPath.c_str());
     m_env.pCryPak->OpenPack(assetsDir, patchObbPath.c_str());
 #endif // AZ_PLATFORM_ANDROID
@@ -473,7 +473,7 @@ void CSystem::OpenLanguagePak(const char* sLanguage)
     AZStd::string sLocalizedPath;
     GetLocalizedPath(sLanguage, sLocalizedPath);
     if (!m_env.pCryPak->OpenPacks(
-            { sLocalizationFolder.c_str(), sLocalizationFolder.size() }, { sLocalizedPath.c_str(), sLocalizedPath.size() }, 0))
+            { sLocalizationFolder.c_str(), sLocalizationFolder.size() }, { sLocalizedPath.c_str(), sLocalizedPath.size() }, nullptr))
     {
         // make sure the localized language is found - not really necessary, for TC
         AZ_Printf("Localization", "Localized language content(%s) not available or modified from the original installation.", sLanguage);
@@ -967,9 +967,9 @@ bool CSystem::Init(const SSystemInitParams& startupParams)
         // tools may not interact with @user@
         if (!gEnv->IsInToolMode())
         {
-            if (m_pCmdLine->FindArg(eCLAT_Pre, "ResetProfile") == 0)
+            if (m_pCmdLine->FindArg(eCLAT_Pre, "ResetProfile") == nullptr)
             {
-                LoadConfiguration("@user@/game.cfg", 0, false);
+                LoadConfiguration("@user@/game.cfg", nullptr, false);
             }
         }
 
@@ -1101,7 +1101,7 @@ bool CSystem::Init(const SSystemInitParams& startupParams)
     InlineInitializationProcessing("CSystem::Init End");
 
     // All CVARs should now be registered, load and apply quality settings for the default quality group
-    // using device rules to auto-detected the correct quality level 
+    // using device rules to auto-detected the correct quality level
     AzFramework::QualitySystemEvents::Bus::Broadcast(
         &AzFramework::QualitySystemEvents::LoadDefaultQualityGroup,
         AzFramework::QualityLevel::LevelFromDeviceRules);

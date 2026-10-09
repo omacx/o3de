@@ -169,5 +169,3 @@ namespace Editor
         }
     }
 }
-
-#include <moc_WindowObserver_mac.cpp>

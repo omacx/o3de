@@ -11,7 +11,6 @@
 
 #include <AzToolsFramework/AzToolsFrameworkAPI.h>
 
-#if !defined(Q_MOC_RUN)
 #include <AzCore/base.h>
 #include <AzCore/Memory/SystemAllocator.h>
 #include "PropertyEditorAPI.h"
@@ -23,14 +22,12 @@
 #include <QWidget>
 #include <QToolButton>
 #include <QComboBox>
-#endif
 
 namespace AzToolsFramework
 {
     class AZTF_API PropertyStringComboBoxCtrl
         : public GenericComboBoxCtrl<AZStd::string>
     {
-        Q_OBJECT
         using ComboBoxBase = GenericComboBoxCtrl<AZStd::string>;
 
         friend class StringEnumPropertyComboBoxHandler;
@@ -41,7 +38,7 @@ namespace AzToolsFramework
         AZ_RTTI(PropertyStringComboBoxCtrl, "{886E5B2C-46F5-4046-B0A3-89C28CB28B38}", ComboBoxBase);
         AZ_CLASS_ALLOCATOR(PropertyStringComboBoxCtrl, AZ::SystemAllocator);
 
-        PropertyStringComboBoxCtrl(QWidget* pParent = NULL);
+        PropertyStringComboBoxCtrl(QWidget* pParent = nullptr);
         ~PropertyStringComboBoxCtrl() override;
 
         void Add(const AZStd::string& value);
@@ -61,13 +58,12 @@ namespace AzToolsFramework
         void ConsumeAttribute(PropertyStringComboBoxCtrl* GUI, AZ::u32 attrib, PropertyAttributeReader* attrValue, const char* debugName) override;
     };
 
+    AZ_PUSH_DISABLE_WARNING(4661, "-Wunknown-warning-option")
+
     class AZTF_API StringEnumPropertyComboBoxHandler
         : QObject
         , public PropertyComboBoxHandlerCommon < AZStd::string >
     {
-        // this is a Qt Object purely so it can connect to slots with context.  This is the only reason its in this header.
-        Q_OBJECT
-
     public:
         AZ_CLASS_ALLOCATOR(StringEnumPropertyComboBoxHandler, AZ::SystemAllocator);
 
@@ -75,6 +71,8 @@ namespace AzToolsFramework
         bool ReadValuesIntoGUI(size_t index, PropertyStringComboBoxCtrl* GUI, const property_t& instance, InstanceDataNode* node)  override;
         QWidget* CreateGUI(QWidget* pParent) override;
     };
+
+    AZ_POP_DISABLE_WARNING
 
     AZTF_API void RegisterStringComboBoxHandler();
 };

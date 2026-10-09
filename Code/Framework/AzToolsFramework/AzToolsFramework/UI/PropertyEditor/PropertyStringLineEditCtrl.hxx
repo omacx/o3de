@@ -11,12 +11,10 @@
 
 #include <AzToolsFramework/AzToolsFrameworkAPI.h>
 
-#if !defined(Q_MOC_RUN)
 #include <AzCore/base.h>
 #include <AzCore/Memory/SystemAllocator.h>
 #include <QWidget>
 #include "PropertyEditorAPI.h"
-#endif
 
 class QLineEdit;
 class QPushButton;
@@ -31,7 +29,7 @@ namespace AzToolsFramework
     public:
         AZ_CLASS_ALLOCATOR(PropertyStringLineEditCtrl, AZ::SystemAllocator);
 
-        PropertyStringLineEditCtrl(QWidget* pParent = NULL);
+        PropertyStringLineEditCtrl(QWidget* pParent = nullptr);
         virtual ~PropertyStringLineEditCtrl();
 
         //! This helper method is used to replicate a user input of editing the value
